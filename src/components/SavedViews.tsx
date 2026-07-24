@@ -23,14 +23,14 @@ export const SavedViews: React.FC<SavedViewsProps> = ({ onViewSelect, currentAss
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-slate-200 mb-6">
-      <h3 className="text-sm font-semibold text-slate-700 mb-3">Saved Views</h3>
+    <div className="bg-white p-4 rounded border border-esusu-gray-border mb-6">
+      <h3 className="text-xs font-bold text-gray-700 mb-3">SAVED VIEWS</h3>
       <div className="flex flex-wrap gap-2">
         {views.map((view) => (
           <button
             key={view.label}
             onClick={() => onViewSelect(view.filters)}
-            className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-esusu-green hover:text-white transition-colors"
           >
             {view.label}
           </button>

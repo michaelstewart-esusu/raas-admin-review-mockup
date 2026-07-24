@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ReviewCase, CasePriority, CaseStatus } from '../types';
 import { formatDistanceToNow, isPast } from 'date-fns';
-import { ChevronRight, AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle, Clock } from 'lucide-react';
 
 interface QueueTableProps {
   cases: ReviewCase[];
@@ -13,21 +13,21 @@ interface QueueTableProps {
 }
 
 const statusColors: Record<CaseStatus, string> = {
-  'New': 'bg-blue-100 text-blue-800',
-  'Assigned': 'bg-gray-100 text-gray-800',
-  'In Review': 'bg-yellow-100 text-yellow-800',
-  'Waiting for Verification': 'bg-orange-100 text-orange-800',
-  'Escalated': 'bg-red-100 text-red-800',
-  'Done': 'bg-green-100 text-green-800',
-  'Closed': 'bg-slate-100 text-slate-800',
-  'OH/DA Pending': 'bg-purple-100 text-purple-800',
-  'Closure Pending': 'bg-pink-100 text-pink-800',
+  'New': 'bg-blue-50 text-blue-700',
+  'Assigned': 'bg-gray-50 text-gray-700',
+  'In Review': 'bg-yellow-50 text-yellow-700',
+  'Waiting for Verification': 'bg-orange-50 text-orange-700',
+  'Escalated': 'bg-red-50 text-red-700',
+  'Done': 'bg-esusu-green-light text-esusu-green',
+  'Closed': 'bg-gray-50 text-gray-700',
+  'OH/DA Pending': 'bg-purple-50 text-purple-700',
+  'Closure Pending': 'bg-pink-50 text-pink-700',
 };
 
 const priorityColors: Record<CasePriority, string> = {
-  'P0': 'bg-red-200 text-red-900 font-bold',
-  'P1': 'bg-orange-200 text-orange-900 font-semibold',
-  'P2': 'bg-yellow-200 text-yellow-900',
+  'P0': 'bg-red-100 text-red-800 font-bold',
+  'P1': 'bg-orange-100 text-orange-800 font-semibold',
+  'P2': 'bg-yellow-100 text-yellow-800',
 };
 
 const reasonLabels: Record<string, string> = {
@@ -69,26 +69,25 @@ export const QueueTable: React.FC<QueueTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+    <div className="bg-white rounded border border-esusu-gray-border overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50 border-b border-slate-200">
+        <thead className="bg-esusu-gray-light border-b border-esusu-gray-border">
           <tr>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Resident</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Account ID</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Client</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Reason</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Priority</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Status</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Assignee</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Queue Age</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700">Due Date</th>
-            <th className="px-6 py-3 text-left font-semibold text-slate-700"></th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Resident</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Account ID</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Client</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Reason</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Priority</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Status</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Assignee</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Queue Age</th>
+            <th className="px-6 py-3 text-left font-semibold text-gray-900">Due Date</th>
           </tr>
         </thead>
         <tbody>
           {filteredCases.length === 0 ? (
             <tr>
-              <td colSpan={10} className="px-6 py-8 text-center text-slate-500">
+              <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                 No cases found matching your filters.
               </td>
             </tr>
@@ -100,19 +99,19 @@ export const QueueTable: React.FC<QueueTableProps> = ({
               return (
                 <tr
                   key={reviewCase.id}
-                  className={`border-b border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors ${
+                  className={`border-b border-esusu-gray-border hover:bg-gray-50 cursor-pointer transition-colors ${
                     overdue ? 'bg-red-50' : ''
                   }`}
                   onClick={() => onSelectCase(reviewCase.id)}
                 >
-                  <td className="px-6 py-4 font-medium text-slate-900">
+                  <td className="px-6 py-4 font-medium text-esusu-green hover:underline">
                     {reviewCase.residentName}
                   </td>
-                  <td className="px-6 py-4 font-mono text-slate-600 text-xs">
+                  <td className="px-6 py-4 font-mono text-gray-600 text-xs">
                     {reviewCase.accountId}
                   </td>
-                  <td className="px-6 py-4 text-slate-700">{reviewCase.client}</td>
-                  <td className="px-6 py-4 text-slate-700">
+                  <td className="px-6 py-4 text-gray-700">{reviewCase.client}</td>
+                  <td className="px-6 py-4 text-gray-700">
                     {reasonLabels[reviewCase.reason] || reviewCase.reason}
                   </td>
                   <td className="px-6 py-4">
@@ -125,23 +124,20 @@ export const QueueTable: React.FC<QueueTableProps> = ({
                       {reviewCase.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-700">
+                  <td className="px-6 py-4 text-gray-700">
                     {reviewCase.assignee || '—'}
                   </td>
-                  <td className="px-6 py-4 text-slate-700">
+                  <td className="px-6 py-4 text-gray-700">
                     <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-slate-500" />
+                      <Clock className="w-4 h-4 text-gray-400" />
                       {queueAge}d
                     </div>
                   </td>
-                  <td className={`px-6 py-4 ${ overdue ? 'text-red-700 font-semibold' : 'text-slate-700' }`}>
+                  <td className={`px-6 py-4 ${ overdue ? 'text-red-700 font-semibold' : 'text-gray-700' }`}>
                     <div className="flex items-center gap-1">
                       {overdue && <AlertCircle className="w-4 h-4 text-red-600" />}
                       {formatDistanceToNow(reviewCase.dueDate, { addSuffix: true })}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <ChevronRight className="w-5 h-5 text-slate-400" />
                   </td>
                 </tr>
               );

@@ -6,7 +6,7 @@ import { QueueFilters } from './components/QueueFilters';
 import { SavedViews } from './components/SavedViews';
 import { CaseDetailPanel } from './components/CaseDetailPanel';
 import { AccountHistoryModal } from './components/AccountHistoryModal';
-import { BarChart3 } from 'lucide-react';
+import { Search, HelpCircle, ChevronDown } from 'lucide-react';
 
 function App() {
   const [cases, setCases] = useState<ReviewCase[]>(mockCases);
@@ -108,74 +108,141 @@ function App() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">RaaS Admin Review Queue</h1>
-                <p className="text-sm text-slate-600">Mockup - Non-connected data</p>
-              </div>
+    <div className="min-h-screen bg-esusu-gray-light flex flex-col">
+      {/* Top Header */}
+      <header className="bg-esusu-teal text-white sticky top-0 z-50">
+        <div className="px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-sm font-medium flex items-center gap-2">
+              Recent <ChevronDown className="w-4 h-4" />
             </div>
-            <div className="flex gap-6 text-sm">
-              <div className="text-center">
-                <p className="text-slate-600">Active Cases</p>
-                <p className="text-2xl font-bold text-slate-900">{activeCaseCount}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-slate-600">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-              </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-10 pr-4 py-2 rounded bg-white/20 text-white placeholder-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+              />
             </div>
+            <button className="text-sm hover:text-gray-200">Need Help?</button>
+            <button className="text-sm hover:text-gray-200">👤</button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Saved Views */}
-        <SavedViews onViewSelect={handleViewSelect} />
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-56 bg-white border-r border-esusu-gray-border">
+          <nav className="p-4 space-y-6">
+            {/* RAAS Section */}
+            <div>
+              <h3 className="text-xs font-bold text-gray-500 mb-3 px-3">RAAS</h3>
+              <ul className="space-y-1">
+                <li>
+                  <button className="w-full text-left px-3 py-2 rounded bg-esusu-green-light text-esusu-green font-medium text-sm hover:bg-esusu-green/10">
+                    Admin Review Queue
+                  </button>
+                </li>
+                <li>
+                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                    Clients
+                  </button>
+                </li>
+              </ul>
+            </div>
 
-        {/* Filters */}
-        <QueueFilters
-          statuses={allStatuses}
-          priorities={allPriorities as any}
-          assignees={mockReviewers}
-          clients={mockClients}
-          onStatusChange={(status) => setFilterStatus(status)}
-          onPriorityChange={(priority) => setFilterPriority(priority)}
-          onAssigneeChange={(assignee) => {
-            if (assignee === 'unassigned') {
-              setFilterAssignee('UNASSIGNED_FILTER');
-            } else {
-              setFilterAssignee(assignee);
-            }
-          }}
-          onClientChange={(client) => setFilterClient(client)}
-        />
+            {/* Other Sections */}
+            <div>
+              <h3 className="text-xs font-bold text-gray-500 mb-3 px-3">MANAGED B2B</h3>
+              <ul className="space-y-1">
+                <li>
+                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                    Residents
+                  </button>
+                </li>
+                <li>
+                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                    Institutions
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </aside>
 
-        {/* Queue Table */}
-        <div className="mt-6">
-          <QueueTable
-            cases={cases}
-            onSelectCase={(caseId) => {
-              setSelectedCaseId(caseId);
-              setShowHistory(false);
-            }}
-            filterStatus={filterStatus as CaseStatus | undefined}
-            filterPriority={filterPriority as any}
-            filterAssignee={
-              filterAssignee === 'UNASSIGNED_FILTER'
-                ? undefined
-                : filterAssignee || undefined
-            }
-            filterClient={filterClient || undefined}
-          />
-        </div>
-      </main>
+        {/* Main Content */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <div className="max-w-7xl">
+            {/* Page Header */}
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Admin Review Queue</h1>
+              <p className="text-sm text-gray-600">Manage and track resident account reviews</p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="bg-white p-4 rounded border border-esusu-gray-border">
+                <p className="text-xs text-gray-600 mb-1">Active Cases</p>
+                <p className="text-2xl font-bold text-gray-900">{activeCaseCount}</p>
+              </div>
+              <div className="bg-white p-4 rounded border border-esusu-gray-border">
+                <p className="text-xs text-gray-600 mb-1">Overdue</p>
+                <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
+              </div>
+              <div className="bg-white p-4 rounded border border-esusu-gray-border">
+                <p className="text-xs text-gray-600 mb-1">Assigned to Me</p>
+                <p className="text-2xl font-bold text-gray-900">{cases.filter(c => c.assignee === 'Alice Chen').length}</p>
+              </div>
+              <div className="bg-white p-4 rounded border border-esusu-gray-border">
+                <p className="text-xs text-gray-600 mb-1">Escalated</p>
+                <p className="text-2xl font-bold text-gray-900">{cases.filter(c => c.status === 'Escalated').length}</p>
+              </div>
+            </div>
+
+            {/* Saved Views */}
+            <SavedViews onViewSelect={handleViewSelect} />
+
+            {/* Filters */}
+            <QueueFilters
+              statuses={allStatuses}
+              priorities={allPriorities as any}
+              assignees={mockReviewers}
+              clients={mockClients}
+              onStatusChange={(status) => setFilterStatus(status)}
+              onPriorityChange={(priority) => setFilterPriority(priority)}
+              onAssigneeChange={(assignee) => {
+                if (assignee === 'unassigned') {
+                  setFilterAssignee('UNASSIGNED_FILTER');
+                } else {
+                  setFilterAssignee(assignee);
+                }
+              }}
+              onClientChange={(client) => setFilterClient(client)}
+            />
+
+            {/* Queue Table */}
+            <div className="mt-6">
+              <QueueTable
+                cases={cases}
+                onSelectCase={(caseId) => {
+                  setSelectedCaseId(caseId);
+                  setShowHistory(false);
+                }}
+                filterStatus={filterStatus as CaseStatus | undefined}
+                filterPriority={filterPriority as any}
+                filterAssignee={
+                  filterAssignee === 'UNASSIGNED_FILTER'
+                    ? undefined
+                    : filterAssignee || undefined
+                }
+                filterClient={filterClient || undefined}
+              />
+            </div>
+          </div>
+        </main>
+      </div>
 
       {/* Case Detail Panel */}
       <CaseDetailPanel
