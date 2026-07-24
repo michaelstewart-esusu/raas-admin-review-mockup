@@ -183,11 +183,14 @@ function App() {
         onClose={() => setSelectedCaseId(null)}
         onStatusChange={handleStatusChange}
         onAssigneeChange={handleAssigneeChange}
+        onShowHistory={() => setShowHistory(true)}
         reviewers={mockReviewers}
       />
 
       {/* Account History Modal */}
-      <AccountHistoryModal history={mockAccountHistory} onClose={() => setShowHistory(false)} />
+      {showHistory && (
+        <AccountHistoryModal history={mockAccountHistory} onClose={() => setShowHistory(false)} />
+      )}
     </div>
   );
 }
