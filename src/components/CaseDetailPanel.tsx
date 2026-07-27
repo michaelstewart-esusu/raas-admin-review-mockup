@@ -8,6 +8,7 @@ interface CaseDetailPanelProps {
   onClose: () => void;
   onStatusChange: (caseId: string, newStatus: CaseStatus) => void;
   onAssigneeChange: (caseId: string, newAssignee: string) => void;
+  onShowHistory: () => void;
   reviewers: string[];
 }
 
@@ -39,6 +40,7 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   onClose,
   onStatusChange,
   onAssigneeChange,
+  onShowHistory,
   reviewers,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -46,13 +48,13 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   if (!reviewCase) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-96 bg-white border-l border-slate-200 shadow-lg overflow-y-auto z-40">
+    <div className="fixed inset-y-0 right-0 w-96 bg-white border-l border-esusu-gray-border shadow-lg overflow-y-auto z-40">
       {/* Header */}
-      <div className="sticky top-0 bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Case Details</h2>
+      <div className="sticky top-0 bg-esusu-gray-light border-b border-esusu-gray-border px-6 py-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900">Case Details</h2>
         <button
           onClick={onClose}
-          className="text-slate-500 hover:text-slate-700 transition-colors"
+          className="text-gray-500 hover:text-gray-700 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -62,15 +64,15 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
       <div className="p-6 space-y-6">
         {/* Resident Info */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Resident</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Resident</h3>
           <div className="space-y-2">
             <div>
-              <p className="text-2xl font-bold text-slate-900">{reviewCase.residentName}</p>
-              <p className="text-sm font-mono text-slate-600">{reviewCase.accountId}</p>
+              <p className="text-2xl font-bold text-gray-900">{reviewCase.residentName}</p>
+              <p className="text-sm font-mono text-gray-600">{reviewCase.accountId}</p>
             </div>
-            <p className="text-sm text-slate-600">{reviewCase.client}</p>
+            <p className="text-sm text-gray-600">{reviewCase.client}</p>
             {reviewCase.property && (
-              <div className="flex items-start gap-2 text-sm text-slate-600">
+              <div className="flex items-start gap-2 text-sm text-gray-600">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span>{reviewCase.property}</span>
               </div>
@@ -80,16 +82,16 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
 
         {/* Review Info */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Review Information</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Review Information</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600">Reason:</span>
-              <span className="text-sm font-medium text-slate-900">
+              <span className="text-sm text-gray-600">Reason:</span>
+              <span className="text-sm font-medium text-gray-900">
                 {reasonLabels[reviewCase.reason] || reviewCase.reason}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600">Priority:</span>
+              <span className="text-sm text-gray-600">Priority:</span>
               <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
                 reviewCase.priority === 'P0' ? 'bg-red-200 text-red-900' :
                 reviewCase.priority === 'P1' ? 'bg-orange-200 text-orange-900' :
@@ -99,30 +101,30 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600">Payment Type:</span>
-              <span className="text-sm font-medium text-slate-900">{reviewCase.paymentType || '—'}</span>
+              <span className="text-sm text-gray-600">Payment Type:</span>
+              <span className="text-sm font-medium text-gray-900">{reviewCase.paymentType || '—'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600">Reporting State:</span>
-              <span className="text-sm font-medium text-slate-900">{reviewCase.reportingState || '—'}</span>
+              <span className="text-sm text-gray-600">Reporting State:</span>
+              <span className="text-sm font-medium text-gray-900">{reviewCase.reportingState || '—'}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-600">Prior Reviews:</span>
-              <span className="text-sm font-medium text-slate-900">{reviewCase.priorReviewCount}</span>
+              <span className="text-sm text-gray-600">Prior Reviews:</span>
+              <span className="text-sm font-medium text-gray-900">{reviewCase.priorReviewCount}</span>
             </div>
           </div>
         </div>
 
         {/* Status & Assignment */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Status & Assignment</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Status & Assignment</h3>
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-medium text-slate-600 mb-2 block">Status</label>
+              <label className="text-xs font-medium text-gray-600 mb-2 block">Status</label>
               <select
                 value={reviewCase.status}
                 onChange={(e) => onStatusChange(reviewCase.id, e.target.value as CaseStatus)}
-                className={`w-full px-3 py-2 border border-slate-300 rounded-md text-sm font-medium ${
+                className={`w-full px-3 py-2 border border-esusu-gray-border rounded text-sm font-medium ${
                   statusColors[reviewCase.status]
                 } cursor-pointer`}
               >
@@ -137,12 +139,11 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 <option value="Closure Pending">Closure Pending</option>
               </select>
             </div>
-            <div>
-              <label className="text-xs font-medium text-slate-600 mb-2 block">Assignee</label>
+            <div>\n              <label className="text-xs font-medium text-gray-600 mb-2 block">Assignee</label>
               <select
                 value={reviewCase.assignee || ''}
                 onChange={(e) => onAssigneeChange(reviewCase.id, e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
               >
                 <option value="">Unassigned</option>
                 {reviewers.map((reviewer) => (
@@ -157,17 +158,17 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
 
         {/* Timeline */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Timeline</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Timeline</h3>
           <div className="space-y-2 text-sm">
             <div>
-              <p className="text-slate-600">Created</p>
-              <p className="font-medium text-slate-900">
+              <p className="text-gray-600">Created</p>
+              <p className="font-medium text-gray-900">
                 {formatDistanceToNow(reviewCase.createdAt, { addSuffix: true })}
               </p>
             </div>
             <div>
-              <p className="text-slate-600">Due</p>
-              <p className="font-medium text-slate-900">
+              <p className="text-gray-600">Due</p>
+              <p className="font-medium text-gray-900">
                 {formatDistanceToNow(reviewCase.dueDate, { addSuffix: true })}
               </p>
             </div>
@@ -176,15 +177,18 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
 
         {/* Deep Link */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Actions</h3>
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Actions</h3>
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-esusu-green text-white rounded hover:bg-esusu-green/90 transition-colors text-sm font-medium">
             <ExternalLink className="w-4 h-4" />
             View in Residents Console
           </button>
         </div>
 
         {/* History Button */}
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition-colors text-sm font-medium">
+        <button
+          onClick={onShowHistory}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-esusu-gray-border text-gray-700 rounded hover:bg-esusu-gray-light transition-colors text-sm font-medium"
+        >
           <History className="w-4 h-4" />
           View Account History
         </button>
