@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ReviewCase, CasePriority, CaseStatus } from '../types';
 import { formatDistanceToNow, isPast } from 'date-fns';
-import { AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface QueueTableProps {
   cases: ReviewCase[];
@@ -11,6 +11,9 @@ interface QueueTableProps {
   filterPriority?: CasePriority;
   filterClient?: string;
 }
+
+type SortField = 'residentName' | 'accountId' | 'client' | 'reason' | 'priority' | 'status' | 'assignee' | 'queueAge' | 'dueDate';
+type SortDirection = 'asc' | 'desc';
 
 const statusColors: Record<CaseStatus, string> = {
   'New': 'bg-blue-50 text-blue-700',
@@ -49,15 +52,19 @@ export const QueueTable: React.FC<QueueTableProps> = ({
   filterPriority,
   filterClient,
 }) => {
-  const filteredCases = useMemo(() => {
-    return cases.filter((c) => {
-      if (filterStatus && c.status !== filterStatus) return false;
-      if (filterAssignee && c.assignee !== filterAssignee) return false;
-      if (filterPriority && c.priority !== filterPriority) return false;
-      if (filterClient && c.client !== filterClient) return false;
-      return true;
-    });
-  }, [cases, filterStatus, filterAssignee, filterPriority, filterClient]);
+  const [sortField, setSortField] = useState<SortField>('priority');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field with ascending direction
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   const getQueueAge = (createdAt: Date): number => {
     const now = new Date();
@@ -68,31 +75,117 @@ export const QueueTable: React.FC<QueueTableProps> = ({
     return isPast(dueDate);
   };
 
+  const getPriorityValue = (priority: CasePriority): number => {
+    const map: Record<CasePriority, number> = { 'P0': 0, 'P1': 1, 'P2': 2 };
+    return map[priority];
+  };
+
+  const filteredAndSortedCases = useMemo(() => {
+    let filtered = cases.filter((c) => {
+      if (filterStatus && c.status !== filterStatus) return false;
+      if (filterAssignee && c.assignee !== filterAssignee) return false;
+      if (filterPriority && c.priority !== filterPriority) return false;
+      if (filterClient && c.client !== filterClient) return false;
+      return true;
+    });
+
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+      let aVal: any;
+      let bVal: any;
+
+      switch (sortField) {
+        case 'residentName':
+          aVal = a.residentName.toLowerCase();
+          bVal = b.residentName.toLowerCase();
+          break;
+        case 'accountId':
+          aVal = a.accountId.toLowerCase();
+          bVal = b.accountId.toLowerCase();
+          break;
+        case 'client':
+          aVal = a.client.toLowerCase();
+          bVal = b.client.toLowerCase();
+          break;
+        case 'reason':
+          aVal = a.reason;
+          bVal = b.reason;
+          break;
+        case 'priority':
+          aVal = getPriorityValue(a.priority);
+          bVal = getPriorityValue(b.priority);
+          break;
+        case 'status':
+          aVal = a.status.toLowerCase();
+          bVal = b.status.toLowerCase();
+          break;
+        case 'assignee':
+          aVal = (a.assignee || '').toLowerCase();
+          bVal = (b.assignee || '').toLowerCase();
+          break;
+        case 'queueAge':
+          aVal = getQueueAge(a.createdAt);
+          bVal = getQueueAge(b.createdAt);
+          break;
+        case 'dueDate':
+          aVal = a.dueDate.getTime();
+          bVal = b.dueDate.getTime();
+          break;
+        default:
+          return 0;
+      }
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return sorted;
+  }, [cases, filterStatus, filterAssignee, filterPriority, filterClient, sortField, sortDirection]);
+
+  const SortHeader: React.FC<{ field: SortField; label: string }> = ({ field, label }) => (
+    <th
+      className="px-6 py-3 text-left font-semibold text-gray-900 cursor-pointer hover:bg-esusu-gray-light transition-colors"
+      onClick={() => handleSort(field)}
+    >
+      <div className="flex items-center gap-2">
+        {label}
+        {sortField === field && (
+          sortDirection === 'asc' ? (
+            <ChevronUp className="w-4 h-4 text-esusu-green" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-esusu-green" />
+          )
+        )}
+      </div>
+    </th>
+  );
+
   return (
     <div className="bg-white rounded border border-esusu-gray-border overflow-x-auto">
       <table className="w-full text-sm">
         <thead className="bg-esusu-gray-light border-b border-esusu-gray-border">
           <tr>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Resident</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Account ID</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Client</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Reason</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Priority</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Status</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Assignee</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Queue Age</th>
-            <th className="px-6 py-3 text-left font-semibold text-gray-900">Due Date</th>
+            <SortHeader field="residentName" label="Resident" />
+            <SortHeader field="accountId" label="Account ID" />
+            <SortHeader field="client" label="Client" />
+            <SortHeader field="reason" label="Reason" />
+            <SortHeader field="priority" label="Priority" />
+            <SortHeader field="status" label="Status" />
+            <SortHeader field="assignee" label="Assignee" />
+            <SortHeader field="queueAge" label="Queue Age" />
+            <SortHeader field="dueDate" label="Due Date" />
           </tr>
         </thead>
         <tbody>
-          {filteredCases.length === 0 ? (
+          {filteredAndSortedCases.length === 0 ? (
             <tr>
               <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                 No cases found matching your filters.
               </td>
             </tr>
           ) : (
-            filteredCases.map((reviewCase) => {
+            filteredAndSortedCases.map((reviewCase) => {
               const overdue = isOverdue(reviewCase.dueDate);
               const queueAge = getQueueAge(reviewCase.createdAt);
 
