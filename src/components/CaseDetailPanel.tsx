@@ -16,15 +16,15 @@ interface CaseDetailPanelProps {
 }
 
 const statusColors: Record<CaseStatus, string> = {
-  'New': 'bg-blue-100 text-blue-800',
-  'Assigned': 'bg-gray-100 text-gray-800',
-  'In Review': 'bg-yellow-100 text-yellow-800',
-  'Waiting for Verification': 'bg-orange-100 text-orange-800',
-  'Escalated': 'bg-red-100 text-red-800',
-  'Done': 'bg-green-100 text-green-800',
-  'Closed': 'bg-slate-100 text-slate-800',
-  'OH/DA Pending': 'bg-purple-100 text-purple-800',
-  'Closure Pending': 'bg-pink-100 text-pink-800',
+  'New': 'bg-sky-50 text-sky-800',
+  'Assigned': 'bg-esusu-gray-light text-esusu-ink',
+  'In Review': 'bg-amber-50 text-amber-800',
+  'Waiting for Verification': 'bg-orange-50 text-orange-800',
+  'Escalated': 'bg-red-50 text-red-700',
+  'Done': 'bg-esusu-green-light text-esusu-teal',
+  'Closed': 'bg-esusu-gray-light text-esusu-ink-muted',
+  'OH/DA Pending': 'bg-violet-50 text-violet-800',
+  'Closure Pending': 'bg-rose-50 text-rose-800',
 };
 
 export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
@@ -65,9 +65,8 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
 
   return (
     <>
-      {/* Backdrop — click outside closes the drawer */}
       <div
-        className="fixed inset-0 bg-black/20 z-[60]"
+        className="fixed inset-0 bg-esusu-teal/25 backdrop-blur-[1px] z-[60]"
         onClick={() => {
           if (!confirmCloseOpen) onClose();
         }}
@@ -75,89 +74,93 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
       />
 
       <div
-        className="fixed inset-y-0 right-0 w-96 bg-white border-l border-esusu-gray-border shadow-lg overflow-y-auto z-[70]"
+        className="fixed inset-y-0 right-0 w-full max-w-md bg-white border-l border-esusu-gray-border shadow-drawer overflow-y-auto z-[70]"
         role="dialog"
         aria-modal="true"
         aria-label="Case details"
       >
-        {/* Header */}
-        <div className="sticky top-0 bg-esusu-gray-light border-b border-esusu-gray-border px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Case Details</h2>
+        <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-esusu-gray-border px-5 py-3.5 flex items-center justify-between z-10">
+          <div>
+            <p className="ac-section-title mb-0.5">Case Details</p>
+            <h2 className="text-base font-semibold text-esusu-ink">{reviewCase.id}</h2>
+          </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="p-1.5 rounded-md text-esusu-ink-muted hover:text-esusu-ink hover:bg-esusu-gray-light transition-colors"
+            aria-label="Close case details"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Resident Info */}
+        <div className="p-5 space-y-6">
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Resident</h3>
+            <h3 className="ac-section-title mb-3">Resident</h3>
             <div className="space-y-2">
               <div>
-                <p className="text-2xl font-bold text-gray-900">{reviewCase.residentName}</p>
-                <p className="text-sm font-mono text-gray-600">{reviewCase.accountId}</p>
+                <p className="text-2xl font-semibold tracking-tight text-esusu-ink">
+                  {reviewCase.residentName}
+                </p>
+                <p className="text-sm font-mono text-esusu-ink-muted mt-0.5">
+                  {reviewCase.accountId}
+                </p>
               </div>
-              <p className="text-sm text-gray-600">{reviewCase.client}</p>
+              <p className="text-sm text-esusu-ink-muted">{reviewCase.client}</p>
               {reviewCase.property && (
-                <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-2 text-sm text-esusu-ink-muted">
+                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-esusu-green" />
                   <span>{reviewCase.property}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Review Info */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Review Information</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Reason:</span>
-                <span className="text-sm font-medium text-gray-900">
+          <div className="border-t border-esusu-gray-border pt-5">
+            <h3 className="ac-section-title mb-3">Review Information</h3>
+            <dl className="space-y-2.5">
+              <div className="flex justify-between items-center gap-3">
+                <dt className="text-sm text-esusu-ink-muted">Reason</dt>
+                <dd className="text-sm font-medium text-esusu-ink text-right">
                   {getReasonLabel(reviewCase.reason)}
-                </span>
+                </dd>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Priority:</span>
-                <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                  reviewCase.priority === 'P0' ? 'bg-red-200 text-red-900' :
-                  reviewCase.priority === 'P1' ? 'bg-orange-200 text-orange-900' :
-                  'bg-yellow-200 text-yellow-900'
-                }`}>
-                  {reviewCase.priority}
-                </span>
+              <div className="flex justify-between items-center gap-3">
+                <dt className="text-sm text-esusu-ink-muted">Priority</dt>
+                <dd>
+                  <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold ring-1 ring-inset ${
+                    reviewCase.priority === 'P0' ? 'bg-red-100 text-red-800 ring-red-200' :
+                    reviewCase.priority === 'P1' ? 'bg-orange-100 text-orange-800 ring-orange-200' :
+                    'bg-amber-100 text-amber-800 ring-amber-200'
+                  }`}>
+                    {reviewCase.priority}
+                  </span>
+                </dd>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Payment Type:</span>
-                <span className="text-sm font-medium text-gray-900">{reviewCase.paymentType || '—'}</span>
+              <div className="flex justify-between items-center gap-3">
+                <dt className="text-sm text-esusu-ink-muted">Payment Type</dt>
+                <dd className="text-sm font-medium text-esusu-ink">{reviewCase.paymentType || '—'}</dd>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Reporting State:</span>
-                <span className="text-sm font-medium text-gray-900">{reviewCase.reportingState || '—'}</span>
+              <div className="flex justify-between items-center gap-3">
+                <dt className="text-sm text-esusu-ink-muted">Reporting State</dt>
+                <dd className="text-sm font-medium text-esusu-ink">{reviewCase.reportingState || '—'}</dd>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Prior Reviews:</span>
-                <span className="text-sm font-medium text-gray-900">{reviewCase.priorReviewCount}</span>
+              <div className="flex justify-between items-center gap-3">
+                <dt className="text-sm text-esusu-ink-muted">Prior Reviews</dt>
+                <dd className="text-sm font-medium text-esusu-ink">{reviewCase.priorReviewCount}</dd>
               </div>
-            </div>
+            </dl>
           </div>
 
-          {/* Status & Assignment */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Status & Assignment</h3>
+          <div className="border-t border-esusu-gray-border pt-5">
+            <h3 className="ac-section-title mb-3">Status & Assignment</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Status</label>
+                <label className="ac-label">Status</label>
                 <select
                   value={reviewCase.status}
                   onChange={(e) => handleStatusSelect(e.target.value as CaseStatus)}
-                  className={`w-full px-3 py-2 border border-esusu-gray-border rounded text-sm font-medium ${
-                    statusColors[reviewCase.status]
-                  } cursor-pointer`}
+                  className={`ac-input font-medium ${statusColors[reviewCase.status]}`}
                 >
                   <option value="New">New</option>
                   <option value="Assigned">Assigned</option>
@@ -171,11 +174,11 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Assignee</label>
+                <label className="ac-label">Assignee</label>
                 <select
                   value={reviewCase.assignee || ''}
                   onChange={(e) => onAssigneeChange(reviewCase.id, e.target.value)}
-                  className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
+                  className="ac-input"
                 >
                   <option value="">Unassigned</option>
                   {reviewers.map((reviewer) => (
@@ -188,76 +191,68 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
             </div>
           </div>
 
-          {/* Notes */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Notes</h3>
+          <div className="border-t border-esusu-gray-border pt-5">
+            <h3 className="ac-section-title mb-3">Notes</h3>
             {notes.length > 0 ? (
               <ul className="space-y-2 mb-3">
                 {notes.map((note, idx) => (
                   <li
                     key={`${idx}-${note.slice(0, 12)}`}
-                    className="text-sm text-gray-800 bg-esusu-gray-light border border-esusu-gray-border rounded px-3 py-2 whitespace-pre-wrap"
+                    className="text-sm text-esusu-ink bg-esusu-gray-light border border-esusu-gray-border rounded-md px-3 py-2 whitespace-pre-wrap"
                   >
                     {note}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500 mb-3">No notes yet.</p>
+              <p className="text-sm text-esusu-ink-subtle mb-3">No notes yet.</p>
             )}
             <textarea
               value={noteDraft}
               onChange={(e) => setNoteDraft(e.target.value)}
               placeholder="Add a note..."
               rows={3}
-              className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green resize-y"
+              className="ac-input resize-y"
             />
             <button
               type="button"
               onClick={handleAddNote}
               disabled={!noteDraft.trim()}
-              className="mt-2 w-full px-4 py-2 bg-esusu-green text-white rounded text-sm font-medium hover:bg-esusu-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ac-btn-primary mt-2 w-full"
             >
               Add note
             </button>
           </div>
 
-          {/* Timeline */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Timeline</h3>
-            <div className="space-y-2 text-sm">
-              <div>
-                <p className="text-gray-600">Created</p>
-                <p className="font-medium text-gray-900">
+          <div className="border-t border-esusu-gray-border pt-5">
+            <h3 className="ac-section-title mb-3">Timeline</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-md border border-esusu-gray-border bg-esusu-gray-light/60 px-3 py-2.5">
+                <p className="text-esusu-ink-muted text-xs mb-1">Created</p>
+                <p className="font-medium text-esusu-ink">
                   {formatDistanceToNow(reviewCase.createdAt, { addSuffix: true })}
                 </p>
               </div>
-              <div>
-                <p className="text-gray-600">Due</p>
-                <p className="font-medium text-gray-900">
+              <div className="rounded-md border border-esusu-gray-border bg-esusu-gray-light/60 px-3 py-2.5">
+                <p className="text-esusu-ink-muted text-xs mb-1">Due</p>
+                <p className="font-medium text-esusu-ink">
                   {formatDistanceToNow(reviewCase.dueDate, { addSuffix: true })}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Deep Link */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Actions</h3>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-esusu-green text-white rounded hover:bg-esusu-green/90 transition-colors text-sm font-medium">
+          <div className="border-t border-esusu-gray-border pt-5 space-y-2.5">
+            <h3 className="ac-section-title mb-1">Actions</h3>
+            <button type="button" className="ac-btn-primary w-full">
               <ExternalLink className="w-4 h-4" />
               View in Residents Console
             </button>
+            <button type="button" onClick={onShowHistory} className="ac-btn-secondary w-full">
+              <History className="w-4 h-4" />
+              View Account History
+            </button>
           </div>
-
-          {/* History Button */}
-          <button
-            onClick={onShowHistory}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-esusu-gray-border text-gray-700 rounded hover:bg-esusu-gray-light transition-colors text-sm font-medium"
-          >
-            <History className="w-4 h-4" />
-            View Account History
-          </button>
         </div>
       </div>
 

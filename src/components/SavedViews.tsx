@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CaseStatus, CasePriority } from '../types';
 
 interface SavedViewsProps {
@@ -22,19 +22,34 @@ export const SavedViews: React.FC<SavedViewsProps> = ({ onViewSelect, currentAss
     { label: 'Closure Needed', filters: { status: 'Closure Pending' as CaseStatus } },
   ];
 
+  const [activeLabel, setActiveLabel] = useState<string | null>(null);
+
   return (
-    <div className="bg-white p-4 rounded border border-esusu-gray-border mb-6">
-      <h3 className="text-xs font-bold text-gray-700 mb-3">SAVED VIEWS</h3>
-      <div className="flex flex-wrap gap-2">
-        {views.map((view) => (
-          <button
-            key={view.label}
-            onClick={() => onViewSelect(view.filters)}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-esusu-green hover:text-white transition-colors"
-          >
-            {view.label}
-          </button>
-        ))}
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="ac-section-title">Saved Views</h3>
+      </div>
+      <div className="flex flex-wrap gap-1.5 border-b border-esusu-gray-border pb-px">
+        {views.map((view) => {
+          const isActive = activeLabel === view.label;
+          return (
+            <button
+              key={view.label}
+              type="button"
+              onClick={() => {
+                setActiveLabel(view.label);
+                onViewSelect(view.filters);
+              }}
+              className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                isActive
+                  ? 'border-esusu-green text-esusu-teal'
+                  : 'border-transparent text-esusu-ink-muted hover:text-esusu-ink hover:border-esusu-gray-border'
+              }`}
+            >
+              {view.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

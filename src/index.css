@@ -2,17 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
+:root {
+  --esusu-teal: #153f32;
+  --esusu-green: #2ea678;
+  --esusu-canvas: #f0f3f2;
+  --esusu-ink: #1a2421;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  margin: 0;
+  font-family: 'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--esusu-canvas);
+  color: var(--esusu-ink);
+}
+
+code,
+.font-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Admin console form controls */
+@layer components {
+  .ac-label {
+    @apply block text-[11px] font-semibold uppercase tracking-[0.06em] text-esusu-ink-muted mb-1.5;
+  }
+
+  .ac-input {
+    @apply w-full px-3 py-2 bg-white border border-esusu-gray-border rounded-md text-sm text-esusu-ink
+      placeholder:text-esusu-ink-subtle
+      focus:outline-none focus:border-esusu-green focus:ring-2 focus:ring-esusu-green/20;
+  }
+
+  .ac-section-title {
+    @apply text-[11px] font-bold uppercase tracking-[0.08em] text-esusu-ink-subtle;
+  }
+
+  .ac-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold
+      bg-esusu-green text-white hover:bg-esusu-green-hover transition-colors
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .ac-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold
+      border border-esusu-gray-border text-esusu-ink bg-white hover:bg-esusu-gray-light transition-colors;
+  }
+
+  .ac-btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-semibold
+      bg-red-600 text-white hover:bg-red-700 transition-colors;
+  }
 }
