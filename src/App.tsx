@@ -87,7 +87,7 @@ function App() {
       auditTrail: [...history.auditTrail].sort(
         (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
       ),
-      notes: selectedCase.notes ? [selectedCase.notes] : [],
+      notes: selectedCase.notes ? [...selectedCase.notes] : [],
       currentStatus: selectedCase.status,
       currentAssignee: selectedCase.assignee,
       currentReason: selectedCase.reason,
@@ -139,6 +139,44 @@ function App() {
 
     setCases((prev) =>
       prev.map((c) => (c.id === caseId ? { ...c, status: newStatus } : c))
+    );
+  };
+
+  const handleAddNote = (caseId: string, note: string) => {
+    const existing = cases.find((c) => c.id === caseId);
+    if (!existing) return;
+
+    const trimmed = note.trim();
+    if (!trimmed) return;
+
+    const now = new Date();
+    const actor = existing.assignee || 'Current User';
+
+    setCaseHistories((prev) => {
+      const prior = prev[caseId] || buildSeedHistory(existing);
+      return {
+        ...prev,
+        [caseId]: {
+          stateHistory: prior.stateHistory,
+          auditTrail: [
+            {
+              timestamp: now,
+              actor,
+              action: 'Note added',
+              current: trimmed,
+            },
+            ...prior.auditTrail,
+          ],
+        },
+      };
+    });
+
+    setCases((prev) =>
+      prev.map((c) =>
+        c.id === caseId
+          ? { ...c, notes: [...(c.notes ?? []), trimmed] }
+          : c
+      )
     );
   };
 
@@ -349,6 +387,7 @@ function App() {
         onClose={() => setSelectedCaseId(null)}
         onStatusChange={handleStatusChange}
         onAssigneeChange={handleAssigneeChange}
+        onAddNote={handleAddNote}
         onShowHistory={() => setShowHistory(true)}
         reviewers={mockReviewers}
       />

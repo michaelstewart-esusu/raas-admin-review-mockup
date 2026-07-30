@@ -119,6 +119,25 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
             </div>
           </div>
 
+          {/* Notes */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 mb-4">Notes</h3>
+            {history.notes.length === 0 ? (
+              <p className="text-sm text-slate-500">No notes on record.</p>
+            ) : (
+              <ul className="space-y-2">
+                {history.notes.map((note, idx) => (
+                  <li
+                    key={`${idx}-${note.slice(0, 12)}`}
+                    className="text-sm text-slate-800 border border-slate-200 rounded-lg p-3 bg-slate-50 whitespace-pre-wrap"
+                  >
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           {/* Audit Trail */}
           <div>
             <h3 className="text-sm font-semibold text-slate-900 mb-4">Audit Trail</h3>
@@ -129,11 +148,15 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
                   <p className="text-xs text-slate-600">
                     {format(entry.timestamp, 'MMM d, yyyy h:mm a')} by {entry.actor}
                   </p>
-                  {entry.prior && entry.current && (
+                  {entry.prior && entry.current ? (
                     <p className="text-xs text-slate-600 mt-1">
                       {entry.prior} → {entry.current}
                     </p>
-                  )}
+                  ) : entry.current ? (
+                    <p className="text-xs text-slate-600 mt-1 whitespace-pre-wrap">
+                      {entry.current}
+                    </p>
+                  ) : null}
                 </div>
               ))}
             </div>
