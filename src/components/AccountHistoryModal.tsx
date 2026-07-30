@@ -1,5 +1,6 @@
 import React from 'react';
 import { CaseHistory } from '../types';
+import { getReasonLabel } from '../data/reasonLabels';
 import { X, Calendar } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -60,7 +61,7 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
                       </span>
                     </div>
                     <p className="text-sm text-slate-700 mt-2">
-                      Reason: <span className="font-medium">{review.reason}</span>
+                      Reason: <span className="font-medium">{getReasonLabel(review.reason)}</span>
                     </p>
                     <p className="text-sm text-slate-700">
                       Assignee: <span className="font-medium">{review.assignee || 'Unassigned'}</span>
