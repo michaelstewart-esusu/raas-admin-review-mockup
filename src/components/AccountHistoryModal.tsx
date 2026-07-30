@@ -2,7 +2,7 @@ import React from 'react';
 import { CaseHistory } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
 import { X, Calendar } from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { format } from 'date-fns';
 
 interface AccountHistoryModalProps {
   history: CaseHistory | null;
@@ -16,8 +16,14 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
   if (!history) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[80]"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="sticky top-0 bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <div>
@@ -34,6 +40,27 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-8">
+          {/* Current Review */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900 mb-4">Current Review</h3>
+            <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-sm font-semibold text-slate-900">Active case</p>
+                <span className="text-xs font-medium text-slate-600">
+                  {history.currentStatus}
+                </span>
+              </div>
+              <p className="text-sm text-slate-700 mt-2">
+                Reason:{' '}
+                <span className="font-medium">{getReasonLabel(history.currentReason)}</span>
+              </p>
+              <p className="text-sm text-slate-700">
+                Assignee:{' '}
+                <span className="font-medium">{history.currentAssignee || 'Unassigned'}</span>
+              </p>
+            </div>
+          </div>
+
           {/* Prior Reviews */}
           <div>
             <h3 className="text-sm font-semibold text-slate-900 mb-4">Prior Reviews</h3>

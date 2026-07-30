@@ -1,12 +1,52 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { mockCases, mockReviewers, mockClients } from './data/mockCases';
-import { ReviewCase, CaseStatus, CaseHistory } from './types';
+import { ReviewCase, CaseStatus, CaseHistory, StateTransition, AuditEntry } from './types';
 import { QueueTable } from './components/QueueTable';
 import { QueueFilters } from './components/QueueFilters';
 import { SavedViews } from './components/SavedViews';
 import { CaseDetailPanel } from './components/CaseDetailPanel';
 import { AccountHistoryModal } from './components/AccountHistoryModal';
-import { Search, HelpCircle, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
+
+type CaseHistoryRecord = {
+  stateHistory: StateTransition[];
+  auditTrail: AuditEntry[];
+};
+
+function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
+  const createdAt = reviewCase.createdAt;
+  const actor = reviewCase.assignee || 'System';
+  const stateHistory: StateTransition[] = [];
+
+  if (reviewCase.status !== 'New') {
+    stateHistory.push({
+      fromState: 'New',
+      toState: reviewCase.status,
+      timestamp: new Date(createdAt.getTime() + 1000 * 60 * 60),
+      actor,
+    });
+  }
+
+  const auditTrail: AuditEntry[] = [
+    {
+      timestamp: new Date(createdAt.getTime() + 1000 * 60),
+      actor: 'System',
+      action: 'Case created',
+      current: 'New',
+    },
+  ];
+
+  if (reviewCase.assignee) {
+    auditTrail.unshift({
+      timestamp: new Date(createdAt.getTime() + 1000 * 60 * 60),
+      actor: 'System',
+      action: 'Case assigned',
+      current: reviewCase.assignee,
+    });
+  }
+
+  return { stateHistory, auditTrail };
+}
 
 function App() {
   const [cases, setCases] = useState<ReviewCase[]>(mockCases);
@@ -16,61 +56,110 @@ function App() {
   const [filterAssignee, setFilterAssignee] = useState<string>('');
   const [filterPriority, setFilterPriority] = useState<string>('');
   const [filterClient, setFilterClient] = useState<string>('');
+  const [caseHistories, setCaseHistories] = useState<Record<string, CaseHistoryRecord>>({});
 
   const selectedCase = useMemo(() => {
     return cases.find((c) => c.id === selectedCaseId) || null;
   }, [selectedCaseId, cases]);
 
-  // Mock account history
-  const mockAccountHistory: CaseHistory | null = selectedCase
-    ? {
-        caseId: selectedCase.id,
-        residentName: selectedCase.residentName,
-        accountId: selectedCase.accountId,
-        priorReviews: cases
-          .filter((c) => c.accountId === selectedCase.accountId && c.id !== selectedCase.id)
-          .slice(0, 3),
-        stateHistory: [
-          {
-            fromState: 'New',
-            toState: 'Assigned',
-            timestamp: new Date(selectedCase.createdAt.getTime() + 1000 * 60 * 60),
-            actor: 'System',
-          },
-          {
-            fromState: 'Assigned',
-            toState: 'In Review',
-            timestamp: new Date(selectedCase.createdAt.getTime() + 1000 * 60 * 60 * 2),
-            actor: selectedCase.assignee || 'Unknown',
-          },
-        ],
-        auditTrail: [
-          {
-            timestamp: new Date(),
-            actor: selectedCase.assignee || 'System',
-            action: 'Case assigned',
-            current: selectedCase.assignee,
-          },
-          {
-            timestamp: new Date(selectedCase.createdAt.getTime() + 1000 * 60),
-            actor: 'System',
-            action: 'Case created',
-            current: 'New',
-          },
-        ],
-        notes: selectedCase.notes ? [selectedCase.notes] : [],
-      }
-    : null;
+  const ensureHistory = useCallback((reviewCase: ReviewCase): CaseHistoryRecord => {
+    return caseHistories[reviewCase.id] || buildSeedHistory(reviewCase);
+  }, [caseHistories]);
+
+  const accountHistory: CaseHistory | null = useMemo(() => {
+    if (!selectedCase) return null;
+
+    const history = ensureHistory(selectedCase);
+
+    return {
+      caseId: selectedCase.id,
+      residentName: selectedCase.residentName,
+      accountId: selectedCase.accountId,
+      priorReviews: cases
+        .filter((c) => c.accountId === selectedCase.accountId && c.id !== selectedCase.id)
+        .slice(0, 3),
+      stateHistory: [...history.stateHistory].sort(
+        (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+      ),
+      auditTrail: [...history.auditTrail].sort(
+        (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+      ),
+      notes: selectedCase.notes ? [selectedCase.notes] : [],
+      currentStatus: selectedCase.status,
+      currentAssignee: selectedCase.assignee,
+      currentReason: selectedCase.reason,
+    };
+  }, [selectedCase, cases, ensureHistory]);
 
   const handleStatusChange = (caseId: string, newStatus: CaseStatus) => {
+    const existing = cases.find((c) => c.id === caseId);
+    if (!existing || existing.status === newStatus) return;
+
+    const actor = existing.assignee || 'Current User';
+    const now = new Date();
+
+    setCaseHistories((prev) => {
+      const prior = prev[caseId] || buildSeedHistory(existing);
+      return {
+        ...prev,
+        [caseId]: {
+          stateHistory: [
+            ...prior.stateHistory,
+            {
+              fromState: existing.status,
+              toState: newStatus,
+              timestamp: now,
+              actor,
+            },
+          ],
+          auditTrail: [
+            {
+              timestamp: now,
+              actor,
+              action: 'Status changed',
+              prior: existing.status,
+              current: newStatus,
+            },
+            ...prior.auditTrail,
+          ],
+        },
+      };
+    });
+
     setCases((prev) =>
       prev.map((c) => (c.id === caseId ? { ...c, status: newStatus } : c))
     );
   };
 
   const handleAssigneeChange = (caseId: string, newAssignee: string) => {
+    const existing = cases.find((c) => c.id === caseId);
+    const nextAssignee = newAssignee || undefined;
+    if (!existing || existing.assignee === nextAssignee) return;
+
+    const now = new Date();
+
+    setCaseHistories((prev) => {
+      const prior = prev[caseId] || buildSeedHistory(existing);
+      return {
+        ...prev,
+        [caseId]: {
+          stateHistory: prior.stateHistory,
+          auditTrail: [
+            {
+              timestamp: now,
+              actor: 'Current User',
+              action: nextAssignee ? 'Case assigned' : 'Case unassigned',
+              prior: existing.assignee || 'Unassigned',
+              current: nextAssignee || 'Unassigned',
+            },
+            ...prior.auditTrail,
+          ],
+        },
+      };
+    });
+
     setCases((prev) =>
-      prev.map((c) => (c.id === caseId ? { ...c, assignee: newAssignee || undefined } : c))
+      prev.map((c) => (c.id === caseId ? { ...c, assignee: nextAssignee } : c))
     );
   };
 
@@ -256,7 +345,7 @@ function App() {
 
       {/* Account History Modal */}
       {showHistory && (
-        <AccountHistoryModal history={mockAccountHistory} onClose={() => setShowHistory(false)} />
+        <AccountHistoryModal history={accountHistory} onClose={() => setShowHistory(false)} />
       )}
     </div>
   );
