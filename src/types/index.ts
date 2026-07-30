@@ -53,6 +53,9 @@ export interface CaseHistory {
   caseId: string;
   residentName: string;
   accountId: string;
+  currentStatus: CaseStatus;
+  currentAssignee?: string;
+  currentReason: ReviewReason;
   priorReviews: ReviewCase[];
   stateHistory: StateTransition[];
   auditTrail: AuditEntry[];
