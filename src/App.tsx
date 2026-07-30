@@ -6,7 +6,19 @@ import { QueueFilters } from './components/QueueFilters';
 import { SavedViews } from './components/SavedViews';
 import { CaseDetailPanel } from './components/CaseDetailPanel';
 import { AccountHistoryModal } from './components/AccountHistoryModal';
-import { Search, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  ChevronDown,
+  HelpCircle,
+  LayoutList,
+  Building2,
+  Users,
+  Landmark,
+  ClipboardList,
+  AlertTriangle,
+  User,
+  Flame,
+} from 'lucide-react';
 
 type CaseHistoryRecord = {
   stateHistory: StateTransition[];
@@ -273,97 +285,162 @@ function App() {
     (c) => new Date() > c.dueDate && !['Done', 'Closed'].includes(c.status)
   ).length;
 
+  const assignedToMeCount = cases.filter((c) => c.assignee === 'Alice Chen').length;
+  const escalatedCount = cases.filter((c) => c.status === 'Escalated').length;
+
   return (
-    <div className="min-h-screen bg-esusu-gray-light flex flex-col">
+    <div className="min-h-screen bg-esusu-canvas flex flex-col font-sans text-esusu-ink">
       {/* Top Header */}
-      <header className="bg-esusu-teal text-white sticky top-0 z-50">
-        <div className="px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="text-sm font-medium flex items-center gap-2">
-              Recent <ChevronDown className="w-4 h-4" />
+      <header className="bg-esusu-teal text-white sticky top-0 z-50 shadow-sm">
+        <div className="h-14 px-4 md:px-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-5 min-w-0">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="w-7 h-7 rounded bg-esusu-green flex items-center justify-center text-xs font-bold tracking-tight">
+                e
+              </div>
+              <div className="leading-tight">
+                <div className="text-[15px] font-semibold tracking-tight">esusu</div>
+                <div className="text-[10px] uppercase tracking-[0.14em] text-white/65">
+                  Admin Console
+                </div>
+              </div>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 text-sm text-white/80 hover:text-white cursor-default">
+              Recent
+              <ChevronDown className="w-3.5 h-3.5 opacity-80" />
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="relative w-44 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55" />
               <input
                 type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 rounded bg-white/20 text-white placeholder-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+                placeholder="Search console..."
+                className="w-full pl-9 pr-3 py-1.5 rounded-md bg-white/10 border border-white/10 text-white placeholder-white/50 text-sm focus:outline-none focus:bg-white/15 focus:ring-2 focus:ring-esusu-green/40"
               />
             </div>
-            <button className="text-sm hover:text-gray-200">Need Help?</button>
-            <button className="text-sm hover:text-gray-200">👤</button>
+            <button
+              type="button"
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm text-white/85 hover:text-white transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Help
+            </button>
+            <button
+              type="button"
+              className="w-8 h-8 rounded-full bg-esusu-teal-mid border border-white/20 text-xs font-semibold hover:bg-esusu-green transition-colors"
+              aria-label="Account menu"
+            >
+              AC
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-56 bg-white border-r border-esusu-gray-border">
-          <nav className="p-4 space-y-6">
-            {/* RAAS Section */}
+        <aside className="w-[232px] shrink-0 bg-white border-r border-esusu-gray-border hidden md:flex md:flex-col">
+          <nav className="p-3 pt-5 space-y-6 flex-1 overflow-y-auto">
             <div>
-              <h3 className="text-xs font-bold text-gray-500 mb-3 px-3">RAAS</h3>
-              <ul className="space-y-1">
+              <h3 className="ac-section-title px-3 mb-2">RaaS</h3>
+              <ul className="space-y-0.5">
                 <li>
-                  <button className="w-full text-left px-3 py-2 rounded bg-esusu-green-light text-esusu-green font-medium text-sm hover:bg-esusu-green/10">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2.5 text-left px-3 py-2 rounded-md bg-esusu-green-light text-esusu-teal font-semibold text-sm border-l-[3px] border-esusu-green"
+                  >
+                    <LayoutList className="w-4 h-4 text-esusu-green" />
                     Admin Review Queue
                   </button>
                 </li>
                 <li>
-                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2.5 text-left px-3 py-2 rounded-md text-esusu-ink-muted text-sm hover:bg-esusu-gray-light hover:text-esusu-ink transition-colors"
+                  >
+                    <Building2 className="w-4 h-4" />
                     Clients
                   </button>
                 </li>
               </ul>
             </div>
 
-            {/* Other Sections */}
             <div>
-              <h3 className="text-xs font-bold text-gray-500 mb-3 px-3">MANAGED B2B</h3>
-              <ul className="space-y-1">
+              <h3 className="ac-section-title px-3 mb-2">Managed B2B</h3>
+              <ul className="space-y-0.5">
                 <li>
-                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2.5 text-left px-3 py-2 rounded-md text-esusu-ink-muted text-sm hover:bg-esusu-gray-light hover:text-esusu-ink transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
                     Residents
                   </button>
                 </li>
                 <li>
-                  <button className="w-full text-left px-3 py-2 rounded text-gray-700 text-sm hover:bg-gray-100">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-2.5 text-left px-3 py-2 rounded-md text-esusu-ink-muted text-sm hover:bg-esusu-gray-light hover:text-esusu-ink transition-colors"
+                  >
+                    <Landmark className="w-4 h-4" />
                     Institutions
                   </button>
                 </li>
               </ul>
             </div>
           </nav>
+          <div className="p-4 border-t border-esusu-gray-border text-[11px] text-esusu-ink-subtle">
+            RaaS Admin Review · Mockup
+          </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-7xl">
-            {/* Page Header */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">Admin Review Queue</h1>
-              <p className="text-sm text-gray-600">Manage and track resident account reviews</p>
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-[1400px] px-4 md:px-8 py-6 md:py-7">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-esusu-ink-subtle">
+              RaaS / Admin Review
+            </div>
+            <div className="mb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+              <div>
+                <h1 className="text-[28px] leading-tight font-semibold text-esusu-ink tracking-tight">
+                  Admin Review Queue
+                </h1>
+                <p className="text-sm text-esusu-ink-muted mt-1">
+                  Triage and resolve resident account reviews across clients
+                </p>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
-              <div className="bg-white p-4 rounded border border-esusu-gray-border">
-                <p className="text-xs text-gray-600 mb-1">Active Cases</p>
-                <p className="text-2xl font-bold text-gray-900">{activeCaseCount}</p>
+            {/* Stats strip */}
+            <div className="mb-5 grid grid-cols-2 lg:grid-cols-4 bg-white border border-esusu-gray-border rounded-lg overflow-hidden shadow-panel">
+              <div className="px-4 py-3.5 border-b lg:border-b-0 lg:border-r border-esusu-gray-border">
+                <div className="flex items-center gap-2 text-esusu-ink-muted mb-1">
+                  <ClipboardList className="w-3.5 h-3.5" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Active Cases</p>
+                </div>
+                <p className="text-2xl font-semibold text-esusu-ink tabular-nums">{activeCaseCount}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-esusu-gray-border">
-                <p className="text-xs text-gray-600 mb-1">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
+              <div className="px-4 py-3.5 border-b lg:border-b-0 lg:border-r border-esusu-gray-border">
+                <div className="flex items-center gap-2 text-red-700 mb-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Overdue</p>
+                </div>
+                <p className="text-2xl font-semibold text-red-700 tabular-nums">{overdueCount}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-esusu-gray-border">
-                <p className="text-xs text-gray-600 mb-1">Assigned to Me</p>
-                <p className="text-2xl font-bold text-gray-900">{cases.filter(c => c.assignee === 'Alice Chen').length}</p>
+              <div className="px-4 py-3.5 border-b lg:border-b-0 lg:border-r border-esusu-gray-border">
+                <div className="flex items-center gap-2 text-esusu-ink-muted mb-1">
+                  <User className="w-3.5 h-3.5" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Assigned to Me</p>
+                </div>
+                <p className="text-2xl font-semibold text-esusu-ink tabular-nums">{assignedToMeCount}</p>
               </div>
-              <div className="bg-white p-4 rounded border border-esusu-gray-border">
-                <p className="text-xs text-gray-600 mb-1">Escalated</p>
-                <p className="text-2xl font-bold text-gray-900">{cases.filter(c => c.status === 'Escalated').length}</p>
+              <div className="px-4 py-3.5">
+                <div className="flex items-center gap-2 text-esusu-ink-muted mb-1">
+                  <Flame className="w-3.5 h-3.5" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Escalated</p>
+                </div>
+                <p className="text-2xl font-semibold text-esusu-ink tabular-nums">{escalatedCount}</p>
               </div>
             </div>
 
@@ -389,7 +466,7 @@ function App() {
             />
 
             {/* Queue Table */}
-            <div className="mt-6">
+            <div className="mt-4">
               <QueueTable
                 cases={cases}
                 onSelectCase={(caseId) => {

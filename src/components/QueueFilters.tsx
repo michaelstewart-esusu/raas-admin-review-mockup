@@ -26,28 +26,26 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
   onSearchChange,
 }) => {
   return (
-    <div className="bg-white p-4 rounded border border-esusu-gray-border space-y-4 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Search */}
+    <div className="bg-white px-4 py-3.5 rounded-lg border border-esusu-gray-border shadow-panel">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">Search</label>
+          <label className="ac-label">Search</label>
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-esusu-ink-subtle" />
             <input
               type="text"
-              placeholder="Name or ID..."
+              placeholder="Name or account ID..."
               onChange={(e) => onSearchChange?.(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
+              className="ac-input pl-9"
             />
           </div>
         </div>
 
-        {/* Status Filter */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">Status</label>
+          <label className="ac-label">Status</label>
           <select
             onChange={(e) => onStatusChange(e.target.value as CaseStatus | '')}
-            className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
+            className="ac-input"
           >
             <option value="">All Statuses</option>
             {statuses.map((status) => (
@@ -58,12 +56,11 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
           </select>
         </div>
 
-        {/* Priority Filter */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">Priority</label>
+          <label className="ac-label">Priority</label>
           <select
             onChange={(e) => onPriorityChange(e.target.value as CasePriority | '')}
-            className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
+            className="ac-input"
           >
             <option value="">All Priorities</option>
             {priorities.map((priority) => (
@@ -74,13 +71,9 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
           </select>
         </div>
 
-        {/* Assignee Filter */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">Assignee</label>
-          <select
-            onChange={(e) => onAssigneeChange(e.target.value)}
-            className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
-          >
+          <label className="ac-label">Assignee</label>
+          <select onChange={(e) => onAssigneeChange(e.target.value)} className="ac-input">
             <option value="">All Assignees</option>
             <option value="unassigned">Unassigned</option>
             {assignees.map((assignee) => (
@@ -91,13 +84,9 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
           </select>
         </div>
 
-        {/* Client Filter */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-2">Client</label>
-          <select
-            onChange={(e) => onClientChange(e.target.value)}
-            className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green"
-          >
+          <label className="ac-label">Client</label>
+          <select onChange={(e) => onClientChange(e.target.value)} className="ac-input">
             <option value="">All Clients</option>
             {clients.map((client) => (
               <option key={client} value={client}>
