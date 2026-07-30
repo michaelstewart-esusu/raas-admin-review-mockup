@@ -32,9 +32,12 @@ export interface ReviewCase {
   notes?: string[];
 }
 
+export type StateChangeKind = 'status' | 'assignee' | 'note';
+
 export interface StateTransition {
-  fromState: CaseStatus;
-  toState: CaseStatus;
+  kind: StateChangeKind;
+  fromState: string;
+  toState: string;
   timestamp: Date;
   actor: string;
   reason?: string;

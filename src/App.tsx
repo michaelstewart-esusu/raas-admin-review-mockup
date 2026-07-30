@@ -20,6 +20,7 @@ function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
 
   if (reviewCase.status !== 'New') {
     stateHistory.push({
+      kind: 'status',
       fromState: 'New',
       toState: reviewCase.status,
       timestamp: new Date(createdAt.getTime() + 1000 * 60 * 60),
@@ -37,6 +38,13 @@ function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
   ];
 
   if (reviewCase.assignee) {
+    stateHistory.push({
+      kind: 'assignee',
+      fromState: 'Unassigned',
+      toState: reviewCase.assignee,
+      timestamp: new Date(createdAt.getTime() + 1000 * 60 * 60),
+      actor: 'System',
+    });
     auditTrail.unshift({
       timestamp: new Date(createdAt.getTime() + 1000 * 60 * 60),
       actor: 'System',
@@ -109,6 +117,7 @@ function App() {
           stateHistory: [
             ...prior.stateHistory,
             {
+              kind: 'status',
               fromState: existing.status,
               toState: newStatus,
               timestamp: now,
@@ -157,7 +166,16 @@ function App() {
       return {
         ...prev,
         [caseId]: {
-          stateHistory: prior.stateHistory,
+          stateHistory: [
+            ...prior.stateHistory,
+            {
+              kind: 'note',
+              fromState: '',
+              toState: trimmed,
+              timestamp: now,
+              actor,
+            },
+          ],
           auditTrail: [
             {
               timestamp: now,
@@ -186,20 +204,31 @@ function App() {
     if (!existing || existing.assignee === nextAssignee) return;
 
     const now = new Date();
+    const fromAssignee = existing.assignee || 'Unassigned';
+    const toAssignee = nextAssignee || 'Unassigned';
 
     setCaseHistories((prev) => {
       const prior = prev[caseId] || buildSeedHistory(existing);
       return {
         ...prev,
         [caseId]: {
-          stateHistory: prior.stateHistory,
+          stateHistory: [
+            ...prior.stateHistory,
+            {
+              kind: 'assignee',
+              fromState: fromAssignee,
+              toState: toAssignee,
+              timestamp: now,
+              actor: 'Current User',
+            },
+          ],
           auditTrail: [
             {
               timestamp: now,
               actor: 'Current User',
               action: nextAssignee ? 'Case assigned' : 'Case unassigned',
-              prior: existing.assignee || 'Unassigned',
-              current: nextAssignee || 'Unassigned',
+              prior: fromAssignee,
+              current: toAssignee,
             },
             ...prior.auditTrail,
           ],

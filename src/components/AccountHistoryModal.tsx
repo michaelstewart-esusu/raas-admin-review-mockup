@@ -102,21 +102,45 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
           {/* State History */}
           <div>
             <h3 className="text-sm font-semibold text-slate-900 mb-4">State History</h3>
-            <div className="space-y-2">
-              {history.stateHistory.map((transition, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-sm">
-                  <div className="w-24 text-slate-600 font-medium text-xs">
-                    {format(transition.timestamp, 'MMM d, yyyy')}
-                  </div>
-                  <div className="flex-1">
-                    <span className="text-slate-900">
-                      {transition.fromState} → {transition.toState}
-                    </span>
-                    <span className="text-slate-500 ml-2 text-xs">by {transition.actor}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {history.stateHistory.length === 0 ? (
+              <p className="text-sm text-slate-500">No state changes on record.</p>
+            ) : (
+              <div className="space-y-2">
+                {history.stateHistory.map((transition, idx) => {
+                  const kindLabel =
+                    transition.kind === 'status'
+                      ? 'Status'
+                      : transition.kind === 'assignee'
+                        ? 'Assignee'
+                        : 'Note';
+
+                  return (
+                    <div key={idx} className="flex items-start gap-3 text-sm">
+                      <div className="w-24 text-slate-600 font-medium text-xs pt-0.5">
+                        {format(transition.timestamp, 'MMM d, yyyy')}
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide mr-2">
+                          {kindLabel}
+                        </span>
+                        {transition.kind === 'note' ? (
+                          <span className="text-slate-900 whitespace-pre-wrap">
+                            {transition.toState}
+                          </span>
+                        ) : (
+                          <span className="text-slate-900">
+                            {transition.fromState} → {transition.toState}
+                          </span>
+                        )}
+                        <span className="text-slate-500 ml-2 text-xs">
+                          by {transition.actor}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Notes */}
