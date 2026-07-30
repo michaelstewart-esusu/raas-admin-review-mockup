@@ -29,7 +29,7 @@ export interface ReviewCase {
   reportingState?: string;
   priorReviewCount: number;
   escalationState?: EscalationType;
-  notes?: string;
+  notes?: string[];
 }
 
 export interface StateTransition {

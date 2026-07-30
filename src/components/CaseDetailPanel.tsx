@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ReviewCase, CaseStatus } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
 import { ConfirmCloseModal } from './ConfirmCloseModal';
@@ -10,6 +10,7 @@ interface CaseDetailPanelProps {
   onClose: () => void;
   onStatusChange: (caseId: string, newStatus: CaseStatus) => void;
   onAssigneeChange: (caseId: string, newAssignee: string) => void;
+  onAddNote: (caseId: string, note: string) => void;
   onShowHistory: () => void;
   reviewers: string[];
 }
@@ -31,10 +32,17 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   onClose,
   onStatusChange,
   onAssigneeChange,
+  onAddNote,
   onShowHistory,
   reviewers,
 }) => {
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState('');
+
+  useEffect(() => {
+    setNoteDraft('');
+    setConfirmCloseOpen(false);
+  }, [reviewCase?.id]);
 
   if (!reviewCase) return null;
 
@@ -45,6 +53,15 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
     }
     onStatusChange(reviewCase.id, status);
   };
+
+  const handleAddNote = () => {
+    const trimmed = noteDraft.trim();
+    if (!trimmed) return;
+    onAddNote(reviewCase.id, trimmed);
+    setNoteDraft('');
+  };
+
+  const notes = reviewCase.notes ?? [];
 
   return (
     <>
@@ -169,6 +186,40 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 </select>
               </div>
             </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Notes</h3>
+            {notes.length > 0 ? (
+              <ul className="space-y-2 mb-3">
+                {notes.map((note, idx) => (
+                  <li
+                    key={`${idx}-${note.slice(0, 12)}`}
+                    className="text-sm text-gray-800 bg-esusu-gray-light border border-esusu-gray-border rounded px-3 py-2 whitespace-pre-wrap"
+                  >
+                    {note}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500 mb-3">No notes yet.</p>
+            )}
+            <textarea
+              value={noteDraft}
+              onChange={(e) => setNoteDraft(e.target.value)}
+              placeholder="Add a note..."
+              rows={3}
+              className="w-full px-3 py-2 border border-esusu-gray-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-esusu-green resize-y"
+            />
+            <button
+              type="button"
+              onClick={handleAddNote}
+              disabled={!noteDraft.trim()}
+              className="mt-2 w-full px-4 py-2 bg-esusu-green text-white rounded text-sm font-medium hover:bg-esusu-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add note
+            </button>
           </div>
 
           {/* Timeline */}
