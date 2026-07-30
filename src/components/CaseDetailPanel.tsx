@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ReviewCase, CaseStatus } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
+import { ConfirmCloseModal } from './ConfirmCloseModal';
 import { X, ExternalLink, History, MapPin } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -33,14 +34,26 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   onShowHistory,
   reviewers,
 }) => {
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+
   if (!reviewCase) return null;
+
+  const handleStatusSelect = (status: CaseStatus) => {
+    if (status === 'Closed') {
+      setConfirmCloseOpen(true);
+      return;
+    }
+    onStatusChange(reviewCase.id, status);
+  };
 
   return (
     <>
       {/* Backdrop — click outside closes the drawer */}
       <div
         className="fixed inset-0 bg-black/20 z-[60]"
-        onClick={onClose}
+        onClick={() => {
+          if (!confirmCloseOpen) onClose();
+        }}
         aria-hidden="true"
       />
 
@@ -124,7 +137,7 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 <label className="text-xs font-medium text-gray-600 mb-2 block">Status</label>
                 <select
                   value={reviewCase.status}
-                  onChange={(e) => onStatusChange(reviewCase.id, e.target.value as CaseStatus)}
+                  onChange={(e) => handleStatusSelect(e.target.value as CaseStatus)}
                   className={`w-full px-3 py-2 border border-esusu-gray-border rounded text-sm font-medium ${
                     statusColors[reviewCase.status]
                   } cursor-pointer`}
@@ -196,6 +209,15 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
           </button>
         </div>
       </div>
+
+      <ConfirmCloseModal
+        open={confirmCloseOpen}
+        onCancel={() => setConfirmCloseOpen(false)}
+        onConfirm={() => {
+          setConfirmCloseOpen(false);
+          onStatusChange(reviewCase.id, 'Closed');
+        }}
+      />
     </>
   );
 };
