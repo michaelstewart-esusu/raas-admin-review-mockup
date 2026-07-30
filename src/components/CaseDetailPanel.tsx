@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ReviewCase, CaseStatus } from '../types';
+import { getReasonLabel } from '../data/reasonLabels';
 import { X, ExternalLink, History, MapPin } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -24,16 +25,6 @@ const statusColors: Record<CaseStatus, string> = {
   'Closure Pending': 'bg-pink-100 text-pink-800',
 };
 
-const reasonLabels: Record<string, string> = {
-  'label_conflict': 'Label Conflict',
-  'possible_p2p': 'Possible P2P',
-  'fraud_risk': 'Fraud Risk',
-  'no_qualifying_rent': 'No Qualifying Rent',
-  'reporting_mismatch': 'Reporting Mismatch',
-  'account_disconnected': 'Account Disconnected',
-  'oh_da_needed': 'OH/DA Needed',
-  'closure_needed': 'Closure Needed',
-};
 
 export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   reviewCase,
@@ -87,7 +78,7 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Reason:</span>
               <span className="text-sm font-medium text-gray-900">
-                {reasonLabels[reviewCase.reason] || reviewCase.reason}
+                {getReasonLabel(reviewCase.reason)}
               </span>
             </div>
             <div className="flex justify-between items-center">

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ReviewCase, CasePriority, CaseStatus } from '../types';
+import { getReasonLabel } from '../data/reasonLabels';
 import { formatDistanceToNow, isPast } from 'date-fns';
 import { AlertCircle, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 
@@ -33,16 +34,6 @@ const priorityColors: Record<CasePriority, string> = {
   'P2': 'bg-yellow-100 text-yellow-800',
 };
 
-const reasonLabels: Record<string, string> = {
-  'label_conflict': 'Label Conflict',
-  'possible_p2p': 'Possible P2P',
-  'fraud_risk': 'Fraud Risk',
-  'no_qualifying_rent': 'No Qualifying Rent',
-  'reporting_mismatch': 'Reporting Mismatch',
-  'account_disconnected': 'Account Disconnected',
-  'oh_da_needed': 'OH/DA Needed',
-  'closure_needed': 'Closure Needed',
-};
 
 export const QueueTable: React.FC<QueueTableProps> = ({
   cases,
@@ -108,8 +99,8 @@ export const QueueTable: React.FC<QueueTableProps> = ({
           bVal = b.client.toLowerCase();
           break;
         case 'reason':
-          aVal = a.reason;
-          bVal = b.reason;
+          aVal = getReasonLabel(a.reason).toLowerCase();
+          bVal = getReasonLabel(b.reason).toLowerCase();
           break;
         case 'priority':
           aVal = getPriorityValue(a.priority);
@@ -205,7 +196,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
                   </td>
                   <td className="px-6 py-4 text-gray-700">{reviewCase.client}</td>
                   <td className="px-6 py-4 text-gray-700">
-                    {reasonLabels[reviewCase.reason] || reviewCase.reason}
+                    {getReasonLabel(reviewCase.reason)}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-2.5 py-1 rounded font-semibold text-xs ${priorityColors[reviewCase.priority]}`}>

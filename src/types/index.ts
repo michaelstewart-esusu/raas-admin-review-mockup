@@ -1,6 +1,15 @@
 export type CaseStatus = 'New' | 'Assigned' | 'In Review' | 'Waiting for Verification' | 'Escalated' | 'Done' | 'Closed' | 'OH/DA Pending' | 'Closure Pending';
 export type CasePriority = 'P0' | 'P1' | 'P2';
-export type ReviewReason = 'label_conflict' | 'possible_p2p' | 'fraud_risk' | 'no_qualifying_rent' | 'reporting_mismatch' | 'account_disconnected' | 'oh_da_needed' | 'closure_needed';
+export type ReviewReason =
+  | 'p2p_deviation'
+  | 'no_user_labels'
+  | 'competing_product'
+  | 'no_admin_labels_new'
+  | 'transaction_deviation_non_p2p'
+  | 'ai_label_conflict'
+  | 'no_admin_labels_old'
+  | 'vantage_review_48h'
+  | 'vantage_review_0_48h';
 export type EscalationType = 'fraud' | 'duplicate_tradeline' | 'ambiguity' | 'documentation_needed' | 'reporting_conflict' | 'high_risk_p2p';
 
 export interface ReviewCase {
