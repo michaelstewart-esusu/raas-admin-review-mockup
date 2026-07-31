@@ -69,10 +69,7 @@ function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
 }
 
 function App() {
-  // Closed cases are not shown in the queue
-  const [cases, setCases] = useState<ReviewCase[]>(
-    () => mockCases.filter((c) => c.status !== 'Closed')
-  );
+  const [cases, setCases] = useState<ReviewCase[]>(mockCases);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [filterStatuses, setFilterStatuses] = useState<CaseStatus[]>([]);
@@ -149,14 +146,6 @@ function App() {
         },
       };
     });
-
-    if (newStatus === 'Closed') {
-      // Closing removes the account from the queue
-      setCases((prev) => prev.filter((c) => c.id !== caseId));
-      setSelectedCaseId(null);
-      setShowHistory(false);
-      return;
-    }
 
     setCases((prev) =>
       prev.map((c) => (c.id === caseId ? { ...c, status: newStatus } : c))
@@ -278,6 +267,7 @@ function App() {
     'Waiting for Verification',
     'Escalated',
     'Done',
+    'Closed',
     'OH/DA Pending',
     'Closure Pending',
   ];
