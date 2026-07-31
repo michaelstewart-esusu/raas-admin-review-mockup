@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { ReviewCase, CaseStatus } from '../types';
+import { ReviewCase, CaseStatus, ConsumerEmail } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
 import { ConfirmCloseModal } from './ConfirmCloseModal';
-import { X, ExternalLink, History, MapPin } from 'lucide-react';
+import {
+  X,
+  ExternalLink,
+  History,
+  MapPin,
+  Mail,
+  Send,
+  CheckCircle2,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface CaseDetailPanelProps {
@@ -11,6 +19,10 @@ interface CaseDetailPanelProps {
   onStatusChange: (caseId: string, newStatus: CaseStatus) => void;
   onAssigneeChange: (caseId: string, newAssignee: string) => void;
   onAddNote: (caseId: string, note: string) => void;
+  onSendEmail: (
+    caseId: string,
+    message: Pick<ConsumerEmail, 'to' | 'subject' | 'body'>
+  ) => void;
   onShowHistory: () => void;
   reviewers: string[];
 }
@@ -33,15 +45,24 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   onStatusChange,
   onAssigneeChange,
   onAddNote,
+  onSendEmail,
   onShowHistory,
   reviewers,
 }) => {
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState('');
+  const [emailComposerOpen, setEmailComposerOpen] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   useEffect(() => {
     setNoteDraft('');
     setConfirmCloseOpen(false);
+    setEmailComposerOpen(false);
+    setEmailSubject('');
+    setEmailBody('');
+    setEmailSent(false);
   }, [reviewCase?.id]);
 
   if (!reviewCase) return null;
@@ -62,6 +83,24 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
   };
 
   const notes = reviewCase.notes ?? [];
+  const emails = reviewCase.emails ?? [];
+  const consumerEmail = reviewCase.consumerEmail ?? '';
+
+  const handleSendEmail = () => {
+    const subject = emailSubject.trim();
+    const body = emailBody.trim();
+    if (!consumerEmail || !subject || !body) return;
+
+    onSendEmail(reviewCase.id, {
+      to: consumerEmail,
+      subject,
+      body,
+    });
+    setEmailSubject('');
+    setEmailBody('');
+    setEmailComposerOpen(false);
+    setEmailSent(true);
+  };
 
   return (
     <>
@@ -107,6 +146,12 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 </p>
               </div>
               <p className="text-sm text-esusu-ink-muted">{reviewCase.client}</p>
+              {consumerEmail && (
+                <div className="flex items-center gap-2 text-sm text-esusu-ink-muted">
+                  <Mail className="w-4 h-4 flex-shrink-0 text-esusu-green" />
+                  <span>{consumerEmail}</span>
+                </div>
+              )}
               {reviewCase.property && (
                 <div className="flex items-start gap-2 text-sm text-esusu-ink-muted">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-esusu-green" />
@@ -114,6 +159,100 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="border-t border-esusu-gray-border pt-5">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 className="ac-section-title">Consumer Communications</h3>
+              {emails.length > 0 && (
+                <span className="text-xs text-esusu-ink-subtle">
+                  {emails.length} sent
+                </span>
+              )}
+            </div>
+
+            {emailSent && (
+              <div
+                className="mb-3 flex items-center gap-2 rounded-md border border-esusu-green-muted bg-esusu-green-light px-3 py-2 text-sm text-esusu-teal"
+                role="status"
+              >
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                Email sent and tracked in Account History.
+              </div>
+            )}
+
+            {!emailComposerOpen ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailSent(false);
+                  setEmailComposerOpen(true);
+                  setEmailSubject(`Update regarding account ${reviewCase.accountId}`);
+                }}
+                className="ac-btn-secondary w-full"
+                disabled={!consumerEmail}
+              >
+                <Mail className="w-4 h-4" />
+                Email consumer
+              </button>
+            ) : (
+              <div className="space-y-3 rounded-md border border-esusu-gray-border bg-esusu-gray-light/40 p-3">
+                <p className="text-xs text-esusu-ink-subtle">
+                  Delivery is simulated in this mockup and tracked for this session.
+                </p>
+                <div>
+                  <label className="ac-label">To</label>
+                  <input
+                    type="email"
+                    value={consumerEmail}
+                    readOnly
+                    className="ac-input bg-esusu-gray-light text-esusu-ink-muted"
+                  />
+                </div>
+                <div>
+                  <label className="ac-label">Subject</label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(event) => setEmailSubject(event.target.value)}
+                    className="ac-input"
+                    placeholder="Email subject"
+                  />
+                </div>
+                <div>
+                  <label className="ac-label">Message</label>
+                  <textarea
+                    value={emailBody}
+                    onChange={(event) => setEmailBody(event.target.value)}
+                    className="ac-input resize-y"
+                    rows={5}
+                    placeholder={`Hi ${reviewCase.residentName},\n\nEnter your message...`}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailComposerOpen(false);
+                      setEmailSubject('');
+                      setEmailBody('');
+                    }}
+                    className="ac-btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSendEmail}
+                    disabled={!emailSubject.trim() || !emailBody.trim()}
+                    className="ac-btn-primary"
+                  >
+                    <Send className="w-4 h-4" />
+                    Send email
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="border-t border-esusu-gray-border pt-5">

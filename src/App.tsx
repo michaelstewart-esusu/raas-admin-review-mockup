@@ -1,6 +1,14 @@
 import { useState, useMemo, useCallback } from 'react';
 import { mockCases, mockReviewers, mockClients } from './data/mockCases';
-import { ReviewCase, CaseStatus, CasePriority, CaseHistory, StateTransition, AuditEntry } from './types';
+import {
+  ReviewCase,
+  CaseStatus,
+  CasePriority,
+  CaseHistory,
+  StateTransition,
+  AuditEntry,
+  ConsumerEmail,
+} from './types';
 import { QueueTable } from './components/QueueTable';
 import { QueueFilters, UNASSIGNED_ASSIGNEE } from './components/QueueFilters';
 import { SavedViews } from './components/SavedViews';
@@ -24,6 +32,9 @@ type CaseHistoryRecord = {
   stateHistory: StateTransition[];
   auditTrail: AuditEntry[];
 };
+
+const getMockConsumerEmail = (residentName: string) =>
+  `${residentName.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@example.com`;
 
 function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
   const createdAt = reviewCase.createdAt;
@@ -69,7 +80,13 @@ function buildSeedHistory(reviewCase: ReviewCase): CaseHistoryRecord {
 }
 
 function App() {
-  const [cases, setCases] = useState<ReviewCase[]>(mockCases);
+  const [cases, setCases] = useState<ReviewCase[]>(() =>
+    mockCases.map((reviewCase) => ({
+      ...reviewCase,
+      consumerEmail:
+        reviewCase.consumerEmail ?? getMockConsumerEmail(reviewCase.residentName),
+    }))
+  );
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [filterStatuses, setFilterStatuses] = useState<CaseStatus[]>([]);
@@ -106,6 +123,7 @@ function App() {
         (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
       ),
       notes: selectedCase.notes ? [...selectedCase.notes] : [],
+      emails: selectedCase.emails ? [...selectedCase.emails] : [],
       currentStatus: selectedCase.status,
       currentAssignee: selectedCase.assignee,
       currentReason: selectedCase.reason,
@@ -196,6 +214,59 @@ function App() {
         c.id === caseId
           ? { ...c, notes: [...(c.notes ?? []), trimmed] }
           : c
+      )
+    );
+  };
+
+  const handleSendEmail = (
+    caseId: string,
+    message: Pick<ConsumerEmail, 'to' | 'subject' | 'body'>
+  ) => {
+    const existing = cases.find((c) => c.id === caseId);
+    if (!existing) return;
+
+    const sentAt = new Date();
+    const sentBy = existing.assignee || 'Current User';
+    const email: ConsumerEmail = {
+      ...message,
+      id: `${caseId}-${sentAt.getTime()}`,
+      sentAt,
+      sentBy,
+    };
+
+    setCaseHistories((prev) => {
+      const prior = prev[caseId] || buildSeedHistory(existing);
+      return {
+        ...prev,
+        [caseId]: {
+          stateHistory: [
+            ...prior.stateHistory,
+            {
+              kind: 'email',
+              fromState: '',
+              toState: `Email sent to ${email.to}: ${email.subject}`,
+              timestamp: sentAt,
+              actor: sentBy,
+            },
+          ],
+          auditTrail: [
+            {
+              timestamp: sentAt,
+              actor: sentBy,
+              action: 'Consumer email sent',
+              current: `${email.to} — ${email.subject}`,
+            },
+            ...prior.auditTrail,
+          ],
+        },
+      };
+    });
+
+    setCases((prev) =>
+      prev.map((reviewCase) =>
+        reviewCase.id === caseId
+          ? { ...reviewCase, emails: [...(reviewCase.emails ?? []), email] }
+          : reviewCase
       )
     );
   };
@@ -489,6 +560,7 @@ function App() {
         onStatusChange={handleStatusChange}
         onAssigneeChange={handleAssigneeChange}
         onAddNote={handleAddNote}
+        onSendEmail={handleSendEmail}
         onShowHistory={() => setShowHistory(true)}
         reviewers={mockReviewers}
       />

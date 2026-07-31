@@ -1,7 +1,7 @@
 import React from 'react';
 import { CaseHistory } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
-import { X, Calendar } from 'lucide-react';
+import { X, Calendar, Mail } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface AccountHistoryModalProps {
@@ -120,7 +120,9 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
                       ? 'Status'
                       : transition.kind === 'assignee'
                         ? 'Assignee'
-                        : 'Note';
+                        : transition.kind === 'email'
+                          ? 'Email'
+                          : 'Note';
 
                   return (
                     <div
@@ -134,7 +136,7 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-esusu-green-light text-esusu-teal mr-2">
                           {kindLabel}
                         </span>
-                        {transition.kind === 'note' ? (
+                        {transition.kind === 'note' || transition.kind === 'email' ? (
                           <span className="text-esusu-ink whitespace-pre-wrap">
                             {transition.toState}
                           </span>
@@ -169,6 +171,45 @@ export const AccountHistoryModal: React.FC<AccountHistoryModalProps> = ({
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+
+          <div>
+            <h3 className="ac-section-title mb-3">Consumer Emails</h3>
+            {history.emails.length === 0 ? (
+              <p className="text-sm text-esusu-ink-subtle">No emails sent on this case.</p>
+            ) : (
+              <div className="space-y-3">
+                {[...history.emails]
+                  .sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime())
+                  .map((email) => (
+                    <div
+                      key={email.id}
+                      className="rounded-md border border-esusu-gray-border bg-esusu-gray-light/40 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="flex items-center gap-2 text-sm font-semibold text-esusu-ink">
+                            <Mail className="w-4 h-4 shrink-0 text-esusu-green" />
+                            <span className="truncate">{email.subject}</span>
+                          </p>
+                          <p className="mt-1 text-xs text-esusu-ink-muted">
+                            To {email.to}
+                          </p>
+                        </div>
+                        <span className="shrink-0 text-xs text-esusu-ink-subtle">
+                          {format(email.sentAt, 'MMM d, yyyy h:mm a')}
+                        </span>
+                      </div>
+                      <p className="mt-3 whitespace-pre-wrap text-sm text-esusu-ink-muted">
+                        {email.body}
+                      </p>
+                      <p className="mt-2 text-xs text-esusu-ink-subtle">
+                        Sent by {email.sentBy}
+                      </p>
+                    </div>
+                  ))}
+              </div>
             )}
           </div>
 
