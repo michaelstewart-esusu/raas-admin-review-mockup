@@ -76,6 +76,7 @@ function App() {
   const [filterAssignees, setFilterAssignees] = useState<string[]>([]);
   const [filterPriorities, setFilterPriorities] = useState<CasePriority[]>([]);
   const [filterClients, setFilterClients] = useState<string[]>([]);
+  const [hideClosedAndDone, setHideClosedAndDone] = useState(true);
   const [caseHistories, setCaseHistories] = useState<Record<string, CaseHistoryRecord>>({});
 
   const selectedCase = useMemo(() => {
@@ -454,10 +455,12 @@ function App() {
               selectedPriorities={filterPriorities}
               selectedAssignees={filterAssignees}
               selectedClients={filterClients}
+              hideClosedAndDone={hideClosedAndDone}
               onStatusesChange={setFilterStatuses}
               onPrioritiesChange={setFilterPriorities}
               onAssigneesChange={setFilterAssignees}
               onClientsChange={setFilterClients}
+              onHideClosedAndDoneChange={setHideClosedAndDone}
             />
 
             {/* Queue Table */}
@@ -472,6 +475,7 @@ function App() {
                 filterPriorities={filterPriorities}
                 filterAssignees={filterAssignees}
                 filterClients={filterClients}
+                hideClosedAndDone={hideClosedAndDone}
               />
             </div>
           </div>
