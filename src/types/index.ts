@@ -12,11 +12,21 @@ export type ReviewReason =
   | 'vantage_review_0_48h';
 export type EscalationType = 'fraud' | 'duplicate_tradeline' | 'ambiguity' | 'documentation_needed' | 'reporting_conflict' | 'high_risk_p2p';
 
+export interface ConsumerEmail {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  sentAt: Date;
+  sentBy: string;
+}
+
 export interface ReviewCase {
   id: string;
   residentName: string;
   accountId: string;
   client: string;
+  consumerEmail?: string;
   property?: string;
   leaseStatus?: string;
   reason: ReviewReason;
@@ -30,9 +40,10 @@ export interface ReviewCase {
   priorReviewCount: number;
   escalationState?: EscalationType;
   notes?: string[];
+  emails?: ConsumerEmail[];
 }
 
-export type StateChangeKind = 'status' | 'assignee' | 'note';
+export type StateChangeKind = 'status' | 'assignee' | 'note' | 'email';
 
 export interface StateTransition {
   kind: StateChangeKind;
@@ -63,4 +74,5 @@ export interface CaseHistory {
   stateHistory: StateTransition[];
   auditTrail: AuditEntry[];
   notes: string[];
+  emails: ConsumerEmail[];
 }
