@@ -7,10 +7,10 @@ import { AlertCircle, Clock, ChevronUp, ChevronDown } from 'lucide-react';
 interface QueueTableProps {
   cases: ReviewCase[];
   onSelectCase: (caseId: string) => void;
-  filterStatus?: CaseStatus;
-  filterAssignee?: string;
-  filterPriority?: CasePriority;
-  filterClient?: string;
+  filterStatuses?: CaseStatus[];
+  filterAssignees?: string[];
+  filterPriorities?: CasePriority[];
+  filterClients?: string[];
 }
 
 type SortField = 'residentName' | 'accountId' | 'client' | 'reason' | 'priority' | 'status' | 'assignee' | 'queueAge' | 'dueDate';
@@ -37,10 +37,10 @@ const priorityColors: Record<CasePriority, string> = {
 export const QueueTable: React.FC<QueueTableProps> = ({
   cases,
   onSelectCase,
-  filterStatus,
-  filterAssignee,
-  filterPriority,
-  filterClient,
+  filterStatuses = [],
+  filterAssignees = [],
+  filterPriorities = [],
+  filterClients = [],
 }) => {
   const [sortField, setSortField] = useState<SortField>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -68,10 +68,13 @@ export const QueueTable: React.FC<QueueTableProps> = ({
 
   const filteredAndSortedCases = useMemo(() => {
     const filtered = cases.filter((c) => {
-      if (filterStatus && c.status !== filterStatus) return false;
-      if (filterAssignee && c.assignee !== filterAssignee) return false;
-      if (filterPriority && c.priority !== filterPriority) return false;
-      if (filterClient && c.client !== filterClient) return false;
+      if (filterStatuses.length > 0 && !filterStatuses.includes(c.status)) return false;
+      if (filterPriorities.length > 0 && !filterPriorities.includes(c.priority)) return false;
+      if (filterClients.length > 0 && !filterClients.includes(c.client)) return false;
+      if (filterAssignees.length > 0) {
+        const assigneeKey = c.assignee ?? '__unassigned__';
+        if (!filterAssignees.includes(assigneeKey)) return false;
+      }
       return true;
     });
 
@@ -124,7 +127,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
       if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [cases, filterStatus, filterAssignee, filterPriority, filterClient, sortField, sortDirection]);
+  }, [cases, filterStatuses, filterAssignees, filterPriorities, filterClients, sortField, sortDirection]);
 
   const SortHeader: React.FC<{ field: SortField; label: string }> = ({ field, label }) => (
     <th

@@ -1,8 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { mockCases, mockReviewers, mockClients } from './data/mockCases';
-import { ReviewCase, CaseStatus, CaseHistory, StateTransition, AuditEntry } from './types';
+import { ReviewCase, CaseStatus, CasePriority, CaseHistory, StateTransition, AuditEntry } from './types';
 import { QueueTable } from './components/QueueTable';
-import { QueueFilters } from './components/QueueFilters';
+import { QueueFilters, UNASSIGNED_ASSIGNEE } from './components/QueueFilters';
 import { SavedViews } from './components/SavedViews';
 import { CaseDetailPanel } from './components/CaseDetailPanel';
 import { AccountHistoryModal } from './components/AccountHistoryModal';
@@ -75,10 +75,10 @@ function App() {
   );
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<CaseStatus | ''>('');
-  const [filterAssignee, setFilterAssignee] = useState<string>('');
-  const [filterPriority, setFilterPriority] = useState<string>('');
-  const [filterClient, setFilterClient] = useState<string>('');
+  const [filterStatuses, setFilterStatuses] = useState<CaseStatus[]>([]);
+  const [filterAssignees, setFilterAssignees] = useState<string[]>([]);
+  const [filterPriorities, setFilterPriorities] = useState<CasePriority[]>([]);
+  const [filterClients, setFilterClients] = useState<string[]>([]);
   const [caseHistories, setCaseHistories] = useState<Record<string, CaseHistoryRecord>>({});
 
   const selectedCase = useMemo(() => {
@@ -255,13 +255,20 @@ function App() {
 
   const handleViewSelect = (filters: {
     status?: CaseStatus;
-    priority?: string;
+    priority?: CasePriority;
     assignee?: string;
     isOverdue?: boolean;
   }) => {
-    setFilterStatus(filters.status || '');
-    setFilterPriority(filters.priority || '');
-    setFilterAssignee(filters.assignee || '');
+    setFilterStatuses(filters.status ? [filters.status] : []);
+    setFilterPriorities(filters.priority ? [filters.priority] : []);
+    if (!filters.assignee) {
+      setFilterAssignees([]);
+    } else if (filters.assignee === 'unassigned') {
+      setFilterAssignees([UNASSIGNED_ASSIGNEE]);
+    } else {
+      setFilterAssignees([filters.assignee]);
+    }
+    setFilterClients([]);
   };
 
   const allStatuses: CaseStatus[] = [
@@ -450,19 +457,17 @@ function App() {
             {/* Filters */}
             <QueueFilters
               statuses={allStatuses}
-              priorities={allPriorities as any}
+              priorities={allPriorities as CasePriority[]}
               assignees={mockReviewers}
               clients={mockClients}
-              onStatusChange={(status) => setFilterStatus(status)}
-              onPriorityChange={(priority) => setFilterPriority(priority)}
-              onAssigneeChange={(assignee) => {
-                if (assignee === 'unassigned') {
-                  setFilterAssignee('UNASSIGNED_FILTER');
-                } else {
-                  setFilterAssignee(assignee);
-                }
-              }}
-              onClientChange={(client) => setFilterClient(client)}
+              selectedStatuses={filterStatuses}
+              selectedPriorities={filterPriorities}
+              selectedAssignees={filterAssignees}
+              selectedClients={filterClients}
+              onStatusesChange={setFilterStatuses}
+              onPrioritiesChange={setFilterPriorities}
+              onAssigneesChange={setFilterAssignees}
+              onClientsChange={setFilterClients}
             />
 
             {/* Queue Table */}
@@ -473,14 +478,10 @@ function App() {
                   setSelectedCaseId(caseId);
                   setShowHistory(false);
                 }}
-                filterStatus={filterStatus as CaseStatus | undefined}
-                filterPriority={filterPriority as any}
-                filterAssignee={
-                  filterAssignee === 'UNASSIGNED_FILTER'
-                    ? undefined
-                    : filterAssignee || undefined
-                }
-                filterClient={filterClient || undefined}
+                filterStatuses={filterStatuses}
+                filterPriorities={filterPriorities}
+                filterAssignees={filterAssignees}
+                filterClients={filterClients}
               />
             </div>
           </div>

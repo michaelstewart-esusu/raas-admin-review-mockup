@@ -1,16 +1,23 @@
 import React from 'react';
 import { CaseStatus, CasePriority } from '../types';
 import { Search } from 'lucide-react';
+import { MultiSelect } from './MultiSelect';
+
+export const UNASSIGNED_ASSIGNEE = '__unassigned__';
 
 interface QueueFiltersProps {
   statuses: CaseStatus[];
   priorities: CasePriority[];
   assignees: string[];
   clients: string[];
-  onStatusChange: (status: CaseStatus | '') => void;
-  onAssigneeChange: (assignee: string) => void;
-  onPriorityChange: (priority: CasePriority | '') => void;
-  onClientChange: (client: string) => void;
+  selectedStatuses: CaseStatus[];
+  selectedPriorities: CasePriority[];
+  selectedAssignees: string[];
+  selectedClients: string[];
+  onStatusesChange: (statuses: CaseStatus[]) => void;
+  onPrioritiesChange: (priorities: CasePriority[]) => void;
+  onAssigneesChange: (assignees: string[]) => void;
+  onClientsChange: (clients: string[]) => void;
   onSearchChange?: (search: string) => void;
 }
 
@@ -19,10 +26,14 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
   priorities,
   assignees,
   clients,
-  onStatusChange,
-  onAssigneeChange,
-  onPriorityChange,
-  onClientChange,
+  selectedStatuses,
+  selectedPriorities,
+  selectedAssignees,
+  selectedClients,
+  onStatusesChange,
+  onPrioritiesChange,
+  onAssigneesChange,
+  onClientsChange,
   onSearchChange,
 }) => {
   return (
@@ -41,60 +52,40 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
           </div>
         </div>
 
-        <div>
-          <label className="ac-label">Status</label>
-          <select
-            onChange={(e) => onStatusChange(e.target.value as CaseStatus | '')}
-            className="ac-input"
-          >
-            <option value="">All Statuses</option>
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
+        <MultiSelect
+          label="Status"
+          placeholder="All Statuses"
+          options={statuses.map((status) => ({ value: status, label: status }))}
+          selected={selectedStatuses}
+          onChange={(next) => onStatusesChange(next as CaseStatus[])}
+        />
 
-        <div>
-          <label className="ac-label">Priority</label>
-          <select
-            onChange={(e) => onPriorityChange(e.target.value as CasePriority | '')}
-            className="ac-input"
-          >
-            <option value="">All Priorities</option>
-            {priorities.map((priority) => (
-              <option key={priority} value={priority}>
-                {priority}
-              </option>
-            ))}
-          </select>
-        </div>
+        <MultiSelect
+          label="Priority"
+          placeholder="All Priorities"
+          options={priorities.map((priority) => ({ value: priority, label: priority }))}
+          selected={selectedPriorities}
+          onChange={(next) => onPrioritiesChange(next as CasePriority[])}
+        />
 
-        <div>
-          <label className="ac-label">Assignee</label>
-          <select onChange={(e) => onAssigneeChange(e.target.value)} className="ac-input">
-            <option value="">All Assignees</option>
-            <option value="unassigned">Unassigned</option>
-            {assignees.map((assignee) => (
-              <option key={assignee} value={assignee}>
-                {assignee}
-              </option>
-            ))}
-          </select>
-        </div>
+        <MultiSelect
+          label="Assignee"
+          placeholder="All Assignees"
+          options={[
+            { value: UNASSIGNED_ASSIGNEE, label: 'Unassigned' },
+            ...assignees.map((assignee) => ({ value: assignee, label: assignee })),
+          ]}
+          selected={selectedAssignees}
+          onChange={onAssigneesChange}
+        />
 
-        <div>
-          <label className="ac-label">Client</label>
-          <select onChange={(e) => onClientChange(e.target.value)} className="ac-input">
-            <option value="">All Clients</option>
-            {clients.map((client) => (
-              <option key={client} value={client}>
-                {client}
-              </option>
-            ))}
-          </select>
-        </div>
+        <MultiSelect
+          label="Client"
+          placeholder="All Clients"
+          options={clients.map((client) => ({ value: client, label: client }))}
+          selected={selectedClients}
+          onChange={onClientsChange}
+        />
       </div>
     </div>
   );
