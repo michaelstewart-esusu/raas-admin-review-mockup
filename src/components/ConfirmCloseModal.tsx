@@ -32,7 +32,7 @@ export const ConfirmCloseModal: React.FC<ConfirmCloseModalProps> = ({
           Are you sure?
         </h2>
         <p id="close-case-description" className="text-sm text-esusu-ink-muted mb-6">
-          Closing the case will remove the account from the queue.
+          Are you sure you want to mark this case as Closed?
         </p>
         <div className="flex justify-end gap-2.5">
           <button type="button" onClick={onCancel} className="ac-btn-secondary">
