@@ -14,10 +14,12 @@ interface QueueFiltersProps {
   selectedPriorities: CasePriority[];
   selectedAssignees: string[];
   selectedClients: string[];
+  hideClosedAndDone: boolean;
   onStatusesChange: (statuses: CaseStatus[]) => void;
   onPrioritiesChange: (priorities: CasePriority[]) => void;
   onAssigneesChange: (assignees: string[]) => void;
   onClientsChange: (clients: string[]) => void;
+  onHideClosedAndDoneChange: (hide: boolean) => void;
   onSearchChange?: (search: string) => void;
 }
 
@@ -30,10 +32,12 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
   selectedPriorities,
   selectedAssignees,
   selectedClients,
+  hideClosedAndDone,
   onStatusesChange,
   onPrioritiesChange,
   onAssigneesChange,
   onClientsChange,
+  onHideClosedAndDoneChange,
   onSearchChange,
 }) => {
   return (
@@ -86,6 +90,23 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
           selected={selectedClients}
           onChange={onClientsChange}
         />
+      </div>
+
+      <div className="mt-3 pt-3 border-t border-esusu-gray-border">
+        <label className="inline-flex items-center gap-2.5 text-sm text-esusu-ink cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hideClosedAndDone}
+            onChange={(e) => onHideClosedAndDoneChange(e.target.checked)}
+            className="w-4 h-4 rounded border-esusu-gray-border text-esusu-green focus:ring-esusu-green/30 accent-esusu-green"
+          />
+          <span>
+            Hide Closed and Done
+            <span className="block text-xs text-esusu-ink-subtle font-normal">
+              Explicitly selected Closed/Done statuses still appear
+            </span>
+          </span>
+        </label>
       </div>
     </div>
   );

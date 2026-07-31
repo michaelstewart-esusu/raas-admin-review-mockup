@@ -11,6 +11,7 @@ interface QueueTableProps {
   filterAssignees?: string[];
   filterPriorities?: CasePriority[];
   filterClients?: string[];
+  hideClosedAndDone?: boolean;
 }
 
 type SortField = 'residentName' | 'accountId' | 'client' | 'reason' | 'priority' | 'status' | 'assignee' | 'queueAge' | 'dueDate';
@@ -41,6 +42,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
   filterAssignees = [],
   filterPriorities = [],
   filterClients = [],
+  hideClosedAndDone = false,
 }) => {
   const [sortField, setSortField] = useState<SortField>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -68,7 +70,14 @@ export const QueueTable: React.FC<QueueTableProps> = ({
 
   const filteredAndSortedCases = useMemo(() => {
     const filtered = cases.filter((c) => {
-      if (filterStatuses.length > 0 && !filterStatuses.includes(c.status)) return false;
+      if (filterStatuses.length > 0) {
+        if (!filterStatuses.includes(c.status)) return false;
+      } else if (hideClosedAndDone && (c.status === 'Closed' || c.status === 'Done')) {
+        // No explicit status selection: hide Closed/Done when the toggle is on.
+        // Explicitly selecting Closed/Done in the status filter still shows them.
+        return false;
+      }
+
       if (filterPriorities.length > 0 && !filterPriorities.includes(c.priority)) return false;
       if (filterClients.length > 0 && !filterClients.includes(c.client)) return false;
       if (filterAssignees.length > 0) {
@@ -127,7 +136,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
       if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [cases, filterStatuses, filterAssignees, filterPriorities, filterClients, sortField, sortDirection]);
+  }, [cases, filterStatuses, filterAssignees, filterPriorities, filterClients, hideClosedAndDone, sortField, sortDirection]);
 
   const SortHeader: React.FC<{ field: SortField; label: string }> = ({ field, label }) => (
     <th
