@@ -7,7 +7,7 @@ A React + TypeScript + Tailwind CSS mockup of the RaaS Admin Review module for A
 ### MVP (Phase 1) - Implemented
 
 - ✅ **Admin Review Queue** - Table view of review cases
-- ✅ **Mock Data** - 15 realistic review cases with varied statuses and priorities
+- ✅ **Mock Data** - 18 realistic review cases with varied statuses and tiers
 - ✅ **Filters & Sorting** - Filter by status, tier, assignee, client
 - ✅ **Saved Views** - Quick access to common views (Unassigned, My Queue, Awaiting Consumer Action, Overdue, Tier 1, Waiting for Verification, Deleted)
 - ✅ **Case Details Panel** - Side panel showing case information
@@ -70,7 +70,7 @@ src/
 │   ├── CaseDetailPanel.tsx  # Side panel for case details
 │   └── AccountHistoryModal.tsx  # Modal for account history
 ├── data/
-│   └── mockCases.ts     # Mock data (15 test cases)
+│   └── mockCases.ts     # Mock data (18 test cases)
 ├── types/
 │   └── index.ts         # TypeScript type definitions
 ├── App.tsx              # Main app component
@@ -88,7 +88,7 @@ src/
 
 ## Mock Data
 
-The app includes 15 mock review cases covering:
+The app includes 18 mock review cases covering:
 
 - The supported statuses: New, Assigned, In Review, Waiting for Verification, Done, Awaiting Consumer Action, Closed, and Deleted
 - Priority tiers derived from the review reason (Tier 1 through Tier 4)
