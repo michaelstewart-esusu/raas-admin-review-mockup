@@ -10,17 +10,20 @@ export const CASE_STATUSES = [
 ] as const;
 
 export type CaseStatus = (typeof CASE_STATUSES)[number];
-export type CasePriority = 'P0' | 'P1' | 'P2';
+
+export const CASE_TIERS = ['Tier 1', 'Tier 2', 'Tier 3', 'Tier 4'] as const;
+
+export type CasePriority = (typeof CASE_TIERS)[number];
 export type ReviewReason =
   | 'p2p_deviation'
   | 'no_user_labels'
   | 'competing_product'
-  | 'no_admin_labels_new'
   | 'transaction_deviation_non_p2p'
   | 'ai_label_conflict'
-  | 'no_admin_labels_old'
-  | 'vantage_review_48h'
-  | 'vantage_review_0_48h';
+  | 'no_admin_labels'
+  | 'plaid_disconnected'
+  | 'ai_transaction_deviation'
+  | 'regular_payment';
 export type EscalationType = 'fraud' | 'duplicate_tradeline' | 'ambiguity' | 'documentation_needed' | 'reporting_conflict' | 'high_risk_p2p';
 
 export interface ConsumerEmail {

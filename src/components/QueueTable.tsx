@@ -12,6 +12,7 @@ interface QueueTableProps {
   filterPriorities?: CasePriority[];
   filterClients?: string[];
   hideClosedAndDone?: boolean;
+  hideTier4?: boolean;
 }
 
 type SortField = 'residentName' | 'accountId' | 'client' | 'reason' | 'priority' | 'status' | 'assignee' | 'queueAge' | 'dueDate';
@@ -29,9 +30,10 @@ const statusColors: Record<CaseStatus, string> = {
 };
 
 const priorityColors: Record<CasePriority, string> = {
-  'P0': 'bg-red-100 text-red-800 ring-red-200 font-bold',
-  'P1': 'bg-orange-100 text-orange-800 ring-orange-200 font-semibold',
-  'P2': 'bg-amber-100 text-amber-800 ring-amber-200 font-medium',
+  'Tier 1': 'bg-red-100 text-red-800 ring-red-200 font-bold',
+  'Tier 2': 'bg-orange-100 text-orange-800 ring-orange-200 font-semibold',
+  'Tier 3': 'bg-amber-100 text-amber-800 ring-amber-200 font-medium',
+  'Tier 4': 'bg-esusu-green-light text-esusu-teal ring-esusu-green-muted font-medium',
 };
 
 export const QueueTable: React.FC<QueueTableProps> = ({
@@ -42,6 +44,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
   filterPriorities = [],
   filterClients = [],
   hideClosedAndDone = false,
+  hideTier4 = false,
 }) => {
   const [sortField, setSortField] = useState<SortField>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -63,7 +66,12 @@ export const QueueTable: React.FC<QueueTableProps> = ({
   const isOverdue = (dueDate: Date): boolean => isPast(dueDate);
 
   const getPriorityValue = (priority: CasePriority): number => {
-    const map: Record<CasePriority, number> = { 'P0': 0, 'P1': 1, 'P2': 2 };
+    const map: Record<CasePriority, number> = {
+      'Tier 1': 1,
+      'Tier 2': 2,
+      'Tier 3': 3,
+      'Tier 4': 4,
+    };
     return map[priority];
   };
 
@@ -77,7 +85,12 @@ export const QueueTable: React.FC<QueueTableProps> = ({
         return false;
       }
 
-      if (filterPriorities.length > 0 && !filterPriorities.includes(c.priority)) return false;
+      if (filterPriorities.length > 0) {
+        if (!filterPriorities.includes(c.priority)) return false;
+      } else if (hideTier4 && c.priority === 'Tier 4') {
+        // An explicit Tier 4 selection overrides the default hide behavior.
+        return false;
+      }
       if (filterClients.length > 0 && !filterClients.includes(c.client)) return false;
       if (filterAssignees.length > 0) {
         const assigneeKey = c.assignee ?? '__unassigned__';
@@ -135,7 +148,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
       if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [cases, filterStatuses, filterAssignees, filterPriorities, filterClients, hideClosedAndDone, sortField, sortDirection]);
+  }, [cases, filterStatuses, filterAssignees, filterPriorities, filterClients, hideClosedAndDone, hideTier4, sortField, sortDirection]);
 
   const SortHeader: React.FC<{ field: SortField; label: string }> = ({ field, label }) => (
     <th
@@ -171,7 +184,7 @@ export const QueueTable: React.FC<QueueTableProps> = ({
               <SortHeader field="accountId" label="Account ID" />
               <SortHeader field="client" label="Client" />
               <SortHeader field="reason" label="Reason" />
-              <SortHeader field="priority" label="Priority" />
+              <SortHeader field="priority" label="Tier" />
               <SortHeader field="status" label="Status" />
               <SortHeader field="assignee" label="Assignee" />
               <SortHeader field="queueAge" label="Queue Age" />

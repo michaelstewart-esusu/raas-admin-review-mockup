@@ -9,6 +9,7 @@ import {
   AuditEntry,
   ConsumerEmail,
   CASE_STATUSES,
+  CASE_TIERS,
 } from './types';
 import { QueueTable } from './components/QueueTable';
 import { QueueFilters, UNASSIGNED_ASSIGNEE } from './components/QueueFilters';
@@ -95,6 +96,7 @@ function App() {
   const [filterPriorities, setFilterPriorities] = useState<CasePriority[]>([]);
   const [filterClients, setFilterClients] = useState<string[]>([]);
   const [hideClosedAndDone, setHideClosedAndDone] = useState(true);
+  const [hideTier4, setHideTier4] = useState(true);
   const [caseHistories, setCaseHistories] = useState<Record<string, CaseHistoryRecord>>({});
 
   const selectedCase = useMemo(() => {
@@ -335,7 +337,7 @@ function App() {
 
   const allStatuses: CaseStatus[] = [...CASE_STATUSES];
 
-  const allPriorities = ['P0', 'P1', 'P2'];
+  const allPriorities: CasePriority[] = [...CASE_TIERS];
 
   const activeCaseCount = cases.filter(
     (c) => !['Done', 'Closed'].includes(c.status)
@@ -520,11 +522,13 @@ function App() {
               selectedAssignees={filterAssignees}
               selectedClients={filterClients}
               hideClosedAndDone={hideClosedAndDone}
+              hideTier4={hideTier4}
               onStatusesChange={setFilterStatuses}
               onPrioritiesChange={setFilterPriorities}
               onAssigneesChange={setFilterAssignees}
               onClientsChange={setFilterClients}
               onHideClosedAndDoneChange={setHideClosedAndDone}
+              onHideTier4Change={setHideTier4}
             />
 
             {/* Queue Table */}
@@ -540,6 +544,7 @@ function App() {
                 filterAssignees={filterAssignees}
                 filterClients={filterClients}
                 hideClosedAndDone={hideClosedAndDone}
+                hideTier4={hideTier4}
               />
             </div>
           </div>

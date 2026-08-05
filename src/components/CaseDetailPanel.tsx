@@ -264,12 +264,13 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                 </dd>
               </div>
               <div className="flex justify-between items-center gap-3">
-                <dt className="text-sm text-esusu-ink-muted">Priority</dt>
+                <dt className="text-sm text-esusu-ink-muted">Tier</dt>
                 <dd>
                   <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold ring-1 ring-inset ${
-                    reviewCase.priority === 'P0' ? 'bg-red-100 text-red-800 ring-red-200' :
-                    reviewCase.priority === 'P1' ? 'bg-orange-100 text-orange-800 ring-orange-200' :
-                    'bg-amber-100 text-amber-800 ring-amber-200'
+                    reviewCase.priority === 'Tier 1' ? 'bg-red-100 text-red-800 ring-red-200' :
+                    reviewCase.priority === 'Tier 2' ? 'bg-orange-100 text-orange-800 ring-orange-200' :
+                    reviewCase.priority === 'Tier 3' ? 'bg-amber-100 text-amber-800 ring-amber-200' :
+                    'bg-esusu-green-light text-esusu-teal ring-esusu-green-muted'
                   }`}>
                     {reviewCase.priority}
                   </span>
