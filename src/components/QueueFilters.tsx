@@ -15,11 +15,13 @@ interface QueueFiltersProps {
   selectedAssignees: string[];
   selectedClients: string[];
   hideClosedAndDone: boolean;
+  hideTier4: boolean;
   onStatusesChange: (statuses: CaseStatus[]) => void;
   onPrioritiesChange: (priorities: CasePriority[]) => void;
   onAssigneesChange: (assignees: string[]) => void;
   onClientsChange: (clients: string[]) => void;
   onHideClosedAndDoneChange: (hide: boolean) => void;
+  onHideTier4Change: (hide: boolean) => void;
   onSearchChange?: (search: string) => void;
 }
 
@@ -33,11 +35,13 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
   selectedAssignees,
   selectedClients,
   hideClosedAndDone,
+  hideTier4,
   onStatusesChange,
   onPrioritiesChange,
   onAssigneesChange,
   onClientsChange,
   onHideClosedAndDoneChange,
+  onHideTier4Change,
   onSearchChange,
 }) => {
   return (
@@ -65,8 +69,8 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
         />
 
         <MultiSelect
-          label="Priority"
-          placeholder="All Priorities"
+          label="Tier"
+          placeholder="All Tiers"
           options={priorities.map((priority) => ({ value: priority, label: priority }))}
           selected={selectedPriorities}
           onChange={(next) => onPrioritiesChange(next as CasePriority[])}
@@ -92,7 +96,7 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
         />
       </div>
 
-      <div className="mt-3 pt-3 border-t border-esusu-gray-border">
+      <div className="mt-3 pt-3 border-t border-esusu-gray-border flex flex-wrap gap-x-8 gap-y-3">
         <label className="inline-flex items-center gap-2.5 text-sm text-esusu-ink cursor-pointer select-none">
           <input
             type="checkbox"
@@ -104,6 +108,20 @@ export const QueueFilters: React.FC<QueueFiltersProps> = ({
             Hide Closed and Done
             <span className="block text-xs text-esusu-ink-subtle font-normal">
               Explicitly selected Closed/Done statuses still appear
+            </span>
+          </span>
+        </label>
+        <label className="inline-flex items-center gap-2.5 text-sm text-esusu-ink cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={hideTier4}
+            onChange={(e) => onHideTier4Change(e.target.checked)}
+            className="w-4 h-4 rounded border-esusu-gray-border text-esusu-green focus:ring-esusu-green/30 accent-esusu-green"
+          />
+          <span>
+            Hide Tier 4
+            <span className="block text-xs text-esusu-ink-subtle font-normal">
+              Explicitly selected Tier 4 still appears
             </span>
           </span>
         </label>

@@ -8,8 +8,8 @@ A React + TypeScript + Tailwind CSS mockup of the RaaS Admin Review module for A
 
 - ✅ **Admin Review Queue** - Table view of review cases
 - ✅ **Mock Data** - 15 realistic review cases with varied statuses and priorities
-- ✅ **Filters & Sorting** - Filter by status, priority, assignee, client
-- ✅ **Saved Views** - Quick access to common views (Unassigned, My Queue, Awaiting Consumer Action, Overdue, P0 Priority, Waiting for Verification, Deleted)
+- ✅ **Filters & Sorting** - Filter by status, tier, assignee, client
+- ✅ **Saved Views** - Quick access to common views (Unassigned, My Queue, Awaiting Consumer Action, Overdue, Tier 1, Waiting for Verification, Deleted)
 - ✅ **Case Details Panel** - Side panel showing case information
 - ✅ **Status & Assignment** - Change case status and reassign cases
 - ✅ **Account History Modal** - View prior reviews and state history
@@ -19,7 +19,7 @@ A React + TypeScript + Tailwind CSS mockup of the RaaS Admin Review module for A
 ### Phase 2 - To Do
 
 - [ ] Escalation workflows UI
-- [ ] OH/DA and Closure queue views
+- [ ] Consumer action and verification queue views
 - [ ] Manager dashboard
 - [ ] Detailed audit trail viewer
 - [ ] Sticky ownership logic
@@ -82,7 +82,7 @@ src/
 
 - `ReviewCase` - Main data model for a review case
 - `CaseStatus` - Valid case states (New, Assigned, In Review, etc.)
-- `CasePriority` - Priority levels (P0, P1, P2)
+- `CasePriority` - Priority tiers (Tier 1, Tier 2, Tier 3, Tier 4)
 - `ReviewReason` - Reason codes for case creation
 - `EscalationType` - Types of escalations
 
@@ -91,12 +91,19 @@ src/
 The app includes 15 mock review cases covering:
 
 - The supported statuses: New, Assigned, In Review, Waiting for Verification, Done, Awaiting Consumer Action, Closed, and Deleted
-- Different priorities (P0, P1, P2)
+- Priority tiers derived from the review reason (Tier 1 through Tier 4)
 - Multiple clients
 - Various review reasons
 - Different assignments
 - Cases with prior review history
 - Overdue and upcoming due dates
+
+### Priority Tiers
+
+- **Tier 1:** P2P rent deviation, competing product, or missing user labels
+- **Tier 2:** Non-P2P rent deviation, AI/user label conflict, missing admin labels, or disconnected Plaid
+- **Tier 3:** AI rent deviation
+- **Tier 4:** Regular rent payment near the expected amount and counterparty
 
 ## Customization
 

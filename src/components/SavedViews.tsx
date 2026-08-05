@@ -20,7 +20,7 @@ export const SavedViews: React.FC<SavedViewsProps> = ({ onViewSelect, currentAss
       filters: { status: 'Awaiting Consumer Action' as CaseStatus },
     },
     { label: 'Overdue', filters: { isOverdue: true } },
-    { label: 'P0 Priority', filters: { priority: 'P0' as CasePriority } },
+    { label: 'Tier 1', filters: { priority: 'Tier 1' as CasePriority } },
     {
       label: 'Waiting for Verification',
       filters: { status: 'Waiting for Verification' as CaseStatus },

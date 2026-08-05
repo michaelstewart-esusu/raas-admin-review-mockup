@@ -1,10 +1,11 @@
 import { ReviewCase } from '../types';
+import { reasonTiers } from './reasonLabels';
 
 const now = new Date();
 const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 const daysFromNow = (days: number) => new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 
-export const mockCases: ReviewCase[] = [
+const mockCasesWithoutTiers: Omit<ReviewCase, 'priority'>[] = [
   {
     id: 'RC001',
     residentName: 'John Smith',
@@ -13,7 +14,6 @@ export const mockCases: ReviewCase[] = [
     property: 'Riverside Apartments',
     leaseStatus: 'Active',
     reason: 'p2p_deviation',
-    priority: 'P0',
     status: 'New',
     createdAt: daysAgo(3),
     dueDate: daysFromNow(2),
@@ -29,7 +29,6 @@ export const mockCases: ReviewCase[] = [
     property: 'Spring Valley Towers',
     leaseStatus: 'Active',
     reason: 'no_user_labels',
-    priority: 'P1',
     status: 'Assigned',
     assignee: 'Alice Chen',
     createdAt: daysAgo(5),
@@ -44,7 +43,6 @@ export const mockCases: ReviewCase[] = [
     accountId: 'ACC-2024-0003',
     client: 'EarnIn',
     reason: 'competing_product',
-    priority: 'P0',
     status: 'In Review',
     assignee: 'David Martinez',
     createdAt: daysAgo(7),
@@ -61,8 +59,7 @@ export const mockCases: ReviewCase[] = [
     client: 'Apriority',
     property: 'Downtown Residences',
     leaseStatus: 'Active',
-    reason: 'no_admin_labels_new',
-    priority: 'P2',
+    reason: 'no_admin_labels',
     status: 'Waiting for Verification',
     assignee: 'Bob Williams',
     createdAt: daysAgo(4),
@@ -77,7 +74,6 @@ export const mockCases: ReviewCase[] = [
     accountId: 'ACC-2024-0005',
     client: 'Solve',
     reason: 'transaction_deviation_non_p2p',
-    priority: 'P1',
     status: 'New',
     createdAt: daysAgo(1),
     dueDate: daysFromNow(4),
@@ -90,8 +86,7 @@ export const mockCases: ReviewCase[] = [
     residentName: 'Lisa Anderson',
     accountId: 'ACC-2024-0006',
     client: 'Zillow',
-    reason: 'ai_label_conflict',
-    priority: 'P1',
+    reason: 'plaid_disconnected',
     status: 'Awaiting Consumer Action',
     assignee: 'Carol White',
     createdAt: daysAgo(2),
@@ -108,8 +103,7 @@ export const mockCases: ReviewCase[] = [
     client: 'resident-api',
     property: 'Tech Park Lofts',
     leaseStatus: 'Active',
-    reason: 'no_admin_labels_old',
-    priority: 'P1',
+    reason: 'no_admin_labels',
     status: 'Waiting for Verification',
     assignee: 'David Martinez',
     createdAt: daysAgo(6),
@@ -123,8 +117,7 @@ export const mockCases: ReviewCase[] = [
     residentName: 'Jennifer Lee',
     accountId: 'ACC-2024-0008',
     client: 'EarnIn',
-    reason: 'vantage_review_48h',
-    priority: 'P0',
+    reason: 'ai_transaction_deviation',
     status: 'Awaiting Consumer Action',
     assignee: 'Alice Chen',
     createdAt: daysAgo(8),
@@ -140,8 +133,7 @@ export const mockCases: ReviewCase[] = [
     client: 'Apriority',
     property: 'Beachfront Towers',
     leaseStatus: 'Terminated',
-    reason: 'vantage_review_0_48h',
-    priority: 'P1',
+    reason: 'regular_payment',
     status: 'Done',
     assignee: 'Bob Williams',
     createdAt: daysAgo(10),
@@ -156,7 +148,6 @@ export const mockCases: ReviewCase[] = [
     accountId: 'ACC-2024-0010',
     client: 'Solve',
     reason: 'competing_product',
-    priority: 'P0',
     status: 'New',
     createdAt: daysAgo(2),
     dueDate: daysFromNow(5),
@@ -169,8 +160,7 @@ export const mockCases: ReviewCase[] = [
     residentName: 'Kevin Jackson',
     accountId: 'ACC-2024-0011',
     client: 'Zillow',
-    reason: 'no_admin_labels_new',
-    priority: 'P2',
+    reason: 'no_admin_labels',
     status: 'New',
     createdAt: daysAgo(0),
     dueDate: daysFromNow(1),
@@ -187,7 +177,6 @@ export const mockCases: ReviewCase[] = [
     property: 'Midtown Plaza',
     leaseStatus: 'Active',
     reason: 'transaction_deviation_non_p2p',
-    priority: 'P1',
     status: 'Assigned',
     assignee: 'Carol White',
     createdAt: daysAgo(9),
@@ -201,8 +190,7 @@ export const mockCases: ReviewCase[] = [
     residentName: 'Steven Harris',
     accountId: 'ACC-2024-0013',
     client: 'EarnIn',
-    reason: 'no_admin_labels_old',
-    priority: 'P1',
+    reason: 'no_admin_labels',
     status: 'Closed',
     assignee: 'Alice Chen',
     createdAt: daysAgo(15),
@@ -217,7 +205,6 @@ export const mockCases: ReviewCase[] = [
     accountId: 'ACC-2024-0014',
     client: 'Apriority',
     reason: 'ai_label_conflict',
-    priority: 'P1',
     status: 'In Review',
     assignee: 'David Martinez',
     createdAt: daysAgo(3),
@@ -234,7 +221,6 @@ export const mockCases: ReviewCase[] = [
     property: 'Innovation Hub',
     leaseStatus: 'Active',
     reason: 'p2p_deviation',
-    priority: 'P0',
     status: 'Assigned',
     assignee: 'Bob Williams',
     createdAt: daysAgo(4),
@@ -244,6 +230,11 @@ export const mockCases: ReviewCase[] = [
     priorReviewCount: 4,
   },
 ];
+
+export const mockCases: ReviewCase[] = mockCasesWithoutTiers.map((reviewCase) => ({
+  ...reviewCase,
+  priority: reasonTiers[reviewCase.reason],
+}));
 
 export const mockReviewers = [
   'Alice Chen',
