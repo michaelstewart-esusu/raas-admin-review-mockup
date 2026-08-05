@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ReviewCase, CaseStatus, ConsumerEmail } from '../types';
+import { ReviewCase, CaseStatus, ConsumerEmail, CASE_STATUSES } from '../types';
 import { getReasonLabel } from '../data/reasonLabels';
 import { ConfirmCloseModal } from './ConfirmCloseModal';
 import {
@@ -32,11 +32,10 @@ const statusColors: Record<CaseStatus, string> = {
   'Assigned': 'bg-esusu-gray-light text-esusu-ink',
   'In Review': 'bg-amber-50 text-amber-800',
   'Waiting for Verification': 'bg-orange-50 text-orange-800',
-  'Escalated': 'bg-red-50 text-red-700',
   'Done': 'bg-esusu-green-light text-esusu-teal',
+  'Awaiting Consumer Action': 'bg-violet-50 text-violet-800',
   'Closed': 'bg-esusu-gray-light text-esusu-ink-muted',
-  'OH/DA Pending': 'bg-violet-50 text-violet-800',
-  'Closure Pending': 'bg-rose-50 text-rose-800',
+  'Deleted': 'bg-red-50 text-red-700',
 };
 
 export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
@@ -301,15 +300,11 @@ export const CaseDetailPanel: React.FC<CaseDetailPanelProps> = ({
                   onChange={(e) => handleStatusSelect(e.target.value as CaseStatus)}
                   className={`ac-input font-medium ${statusColors[reviewCase.status]}`}
                 >
-                  <option value="New">New</option>
-                  <option value="Assigned">Assigned</option>
-                  <option value="In Review">In Review</option>
-                  <option value="Waiting for Verification">Waiting for Verification</option>
-                  <option value="Escalated">Escalated</option>
-                  <option value="Done">Done</option>
-                  <option value="Closed">Closed</option>
-                  <option value="OH/DA Pending">OH/DA Pending</option>
-                  <option value="Closure Pending">Closure Pending</option>
+                  {CASE_STATUSES.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>

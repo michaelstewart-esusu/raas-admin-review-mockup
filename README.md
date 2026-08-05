@@ -9,7 +9,7 @@ A React + TypeScript + Tailwind CSS mockup of the RaaS Admin Review module for A
 - ✅ **Admin Review Queue** - Table view of review cases
 - ✅ **Mock Data** - 15 realistic review cases with varied statuses and priorities
 - ✅ **Filters & Sorting** - Filter by status, priority, assignee, client
-- ✅ **Saved Views** - Quick access to common views (Unassigned, My Queue, Escalated, Overdue, P0 Priority, OH/DA Needed, Closure Needed)
+- ✅ **Saved Views** - Quick access to common views (Unassigned, My Queue, Awaiting Consumer Action, Overdue, P0 Priority, Waiting for Verification, Deleted)
 - ✅ **Case Details Panel** - Side panel showing case information
 - ✅ **Status & Assignment** - Change case status and reassign cases
 - ✅ **Account History Modal** - View prior reviews and state history
@@ -90,7 +90,7 @@ src/
 
 The app includes 15 mock review cases covering:
 
-- Different statuses (New, Assigned, In Review, Done, Escalated, etc.)
+- The supported statuses: New, Assigned, In Review, Waiting for Verification, Done, Awaiting Consumer Action, Closed, and Deleted
 - Different priorities (P0, P1, P2)
 - Multiple clients
 - Various review reasons

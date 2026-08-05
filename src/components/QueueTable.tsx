@@ -22,11 +22,10 @@ const statusColors: Record<CaseStatus, string> = {
   'Assigned': 'bg-esusu-gray-light text-esusu-ink-muted ring-esusu-gray-border',
   'In Review': 'bg-amber-50 text-amber-800 ring-amber-200',
   'Waiting for Verification': 'bg-orange-50 text-orange-800 ring-orange-200',
-  'Escalated': 'bg-red-50 text-red-700 ring-red-200',
   'Done': 'bg-esusu-green-light text-esusu-teal ring-esusu-green-muted',
+  'Awaiting Consumer Action': 'bg-violet-50 text-violet-800 ring-violet-200',
   'Closed': 'bg-esusu-gray-light text-esusu-ink-muted ring-esusu-gray-border',
-  'OH/DA Pending': 'bg-violet-50 text-violet-800 ring-violet-200',
-  'Closure Pending': 'bg-rose-50 text-rose-800 ring-rose-200',
+  'Deleted': 'bg-red-50 text-red-700 ring-red-200',
 };
 
 const priorityColors: Record<CasePriority, string> = {
