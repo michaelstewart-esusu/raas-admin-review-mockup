@@ -8,6 +8,7 @@ import {
   StateTransition,
   AuditEntry,
   ConsumerEmail,
+  CASE_STATUSES,
 } from './types';
 import { QueueTable } from './components/QueueTable';
 import { QueueFilters, UNASSIGNED_ASSIGNEE } from './components/QueueFilters';
@@ -332,17 +333,7 @@ function App() {
     setFilterClients([]);
   };
 
-  const allStatuses: CaseStatus[] = [
-    'New',
-    'Assigned',
-    'In Review',
-    'Waiting for Verification',
-    'Escalated',
-    'Done',
-    'Closed',
-    'OH/DA Pending',
-    'Closure Pending',
-  ];
+  const allStatuses: CaseStatus[] = [...CASE_STATUSES];
 
   const allPriorities = ['P0', 'P1', 'P2'];
 
@@ -355,7 +346,9 @@ function App() {
   ).length;
 
   const assignedToMeCount = cases.filter((c) => c.assignee === 'Alice Chen').length;
-  const escalatedCount = cases.filter((c) => c.status === 'Escalated').length;
+  const awaitingActionCount = cases.filter(
+    (c) => c.status === 'Awaiting Consumer Action'
+  ).length;
 
   return (
     <div className="min-h-screen bg-esusu-canvas flex flex-col font-sans text-esusu-ink">
@@ -507,9 +500,9 @@ function App() {
               <div className="px-4 py-3.5">
                 <div className="flex items-center gap-2 text-esusu-ink-muted mb-1">
                   <Flame className="w-3.5 h-3.5" />
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Escalated</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Awaiting Action</p>
                 </div>
-                <p className="text-2xl font-semibold text-esusu-ink tabular-nums">{escalatedCount}</p>
+                <p className="text-2xl font-semibold text-esusu-ink tabular-nums">{awaitingActionCount}</p>
               </div>
             </div>
 

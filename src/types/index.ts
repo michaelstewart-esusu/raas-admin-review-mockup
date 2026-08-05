@@ -1,4 +1,15 @@
-export type CaseStatus = 'New' | 'Assigned' | 'In Review' | 'Waiting for Verification' | 'Escalated' | 'Done' | 'Closed' | 'OH/DA Pending' | 'Closure Pending';
+export const CASE_STATUSES = [
+  'New',
+  'Assigned',
+  'In Review',
+  'Waiting for Verification',
+  'Done',
+  'Awaiting Consumer Action',
+  'Closed',
+  'Deleted',
+] as const;
+
+export type CaseStatus = (typeof CASE_STATUSES)[number];
 export type CasePriority = 'P0' | 'P1' | 'P2';
 export type ReviewReason =
   | 'p2p_deviation'

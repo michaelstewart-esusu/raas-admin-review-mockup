@@ -15,11 +15,17 @@ export const SavedViews: React.FC<SavedViewsProps> = ({ onViewSelect, currentAss
   const views = [
     { label: 'Unassigned', filters: { assignee: 'unassigned' } },
     { label: 'My Queue', filters: { assignee: currentAssignee || 'Alice Chen' } },
-    { label: 'Escalated', filters: { status: 'Escalated' as CaseStatus } },
+    {
+      label: 'Awaiting Consumer Action',
+      filters: { status: 'Awaiting Consumer Action' as CaseStatus },
+    },
     { label: 'Overdue', filters: { isOverdue: true } },
     { label: 'P0 Priority', filters: { priority: 'P0' as CasePriority } },
-    { label: 'OH/DA Needed', filters: { status: 'OH/DA Pending' as CaseStatus } },
-    { label: 'Closure Needed', filters: { status: 'Closure Pending' as CaseStatus } },
+    {
+      label: 'Waiting for Verification',
+      filters: { status: 'Waiting for Verification' as CaseStatus },
+    },
+    { label: 'Deleted', filters: { status: 'Deleted' as CaseStatus } },
   ];
 
   const [activeLabel, setActiveLabel] = useState<string | null>(null);
